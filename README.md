@@ -118,7 +118,7 @@ db.sqlite.isolation = READ_UNCOMMITTED
 Supported key are the following:
 
 |Key|Description|Default value|
---------------------------------
+|---|----------- |-----|
 |driver| the JDBC driver class | _mandatory_
 |url| the JDBC url | _mandatory_
 |logStatements| if set to true, dump the statements | false
