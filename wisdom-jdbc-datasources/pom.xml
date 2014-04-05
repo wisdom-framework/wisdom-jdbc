@@ -5,14 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <groupId>org.wisdom-framework</groupId>
+        <artifactId>wisdom-jdbc</artifactId>
+        <version>0.4-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.wisdom-framework</groupId>
     <artifactId>wisdom-jdbc-datasources</artifactId>
-    <version>1.0-SNAPSHOT</version>
 
     <packaging>wisdom</packaging>
 
@@ -20,7 +18,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>16.0.1</version>
             <scope>provided</scope>
         </dependency>
         <!-- The connection pool -->
@@ -76,55 +73,47 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>wisdom-api</artifactId>
-            <version>${project.version}</version>
+            <version>${wisdom.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>wisdom-test</artifactId>
-            <version>${project.version}</version>
+            <version>${wisdom.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>1.6.0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.ipojo.annotations</artifactId>
-            <version>1.11.2</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jcl</artifactId>
-            <version>1.6.1</version>
+            <version>1.7.6</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-- Used in test -->
             <groupId>${project.groupId}</groupId>
             <artifactId>application-configuration</artifactId>
-            <version>${project.version}</version>
+            <version>${wisdom.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>5.0.0</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -141,7 +130,7 @@
             <plugin>
                 <groupId>org.wisdom-framework</groupId>
                 <artifactId>wisdom-maven-plugin</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>${wisdom.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <excludeTransitive>true</excludeTransitive>
