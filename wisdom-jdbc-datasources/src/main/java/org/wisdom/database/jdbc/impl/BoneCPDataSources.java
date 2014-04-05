@@ -355,7 +355,6 @@ public class BoneCPDataSources implements DataSources {
     }
 
     public synchronized Driver getDriver(String classname) throws SQLException {
-        System.out.println(drivers);
         DataSourceFactory factory = drivers.get(classname);
         if (factory != null) {
             return factory.createDriver(null);
