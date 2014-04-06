@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>wisdom-jdbc</artifactId>
-    <version>0.4</version>
+    <version>0.5-SNAPSHOT</version>
 
     <properties>
         <!-- should match Wisdom parent -->
@@ -29,7 +29,7 @@
         <url>https://github.com/wisdom-framework/wisdom-jdbc/</url>
         <connection>scm:git:git@github.com:wisdom-framework/wisdom-jdbc.git</connection>
         <developerConnection>scm:git:git@github.com:wisdom-framework/wisdom-jdbc.git</developerConnection>
-      <tag>wisdom-jdbc-0.4</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <profiles>

@@ -5,11 +5,11 @@
     <parent>
         <groupId>org.wisdom-framework</groupId>
         <artifactId>wisdom-jdbc-drivers</artifactId>
-        <version>0.4</version>
+        <version>0.5-SNAPSHOT</version>
     </parent>
 
     <artifactId>sqlite-jdbc</artifactId>
-    <version>3.7.2_1</version>
+    <version>3.7.2_2-SNAPSHOT</version>
 
     <packaging>bundle</packaging>
     <properties>
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>abstract-jdbc-driver</artifactId>
-            <version>0.4</version>
+            <version>0.5-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
