@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.wisdom-framework</groupId>
         <artifactId>wisdom-framework</artifactId>
-        <version>0.4</version>
+        <version>0.6.1</version>
     </parent>
 
     <artifactId>wisdom-jdbc</artifactId>
@@ -13,7 +13,7 @@
 
     <properties>
         <!-- should match Wisdom parent -->
-        <wisdom.version>0.4</wisdom.version>
+        <wisdom.version>0.6.1</wisdom.version>
     </properties>
 
     <packaging>pom</packaging>
