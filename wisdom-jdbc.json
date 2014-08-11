@@ -1,0 +1,28 @@
+{
+    "name": "wisdom-jdbc",
+    "version":"0.4",
+    "description": "This project integrates JDBC data sources within Wisdom-Framework compatible with OSGI. Lets you access the configured data sources. This service manages the connections to the data source. ",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/wisdom-framework/wisdom-jdbc"
+    },
+
+    "author": "The Wisdom Team",
+    "license": {
+            "type": "Apache",
+            "url": "https://github.com/wisdom-framework/wisdom-jdbc/blob/master/LICENSE.txt"
+        },
+    "homepage": "https://github.com/wisdom-framework/wisdom-jdbc",
+    "keywords": [
+        "JDBC",
+        "database",
+        "apache derby",
+        "h2",
+        "hsql",
+        "mysql",
+        "postgresql",
+        "sqlite"
+        
+    ]
+}
+
