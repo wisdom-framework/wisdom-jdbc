@@ -23,6 +23,9 @@
     <modules>
         <module>wisdom-jdbc-drivers</module>
         <module>wisdom-jdbc-datasources</module>
+        <module>wisdom-jpa-manager</module>
+        <module>wisdom-openjpa-enhancer-plugin</module>
+        <module>openjpa-sample</module>
     </modules>
 
     <scm>
