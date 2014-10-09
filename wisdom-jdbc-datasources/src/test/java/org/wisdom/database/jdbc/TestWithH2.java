@@ -81,7 +81,7 @@ public class TestWithH2 {
                 "default.logStatements", "true"
         );
         MapConfiguration h2Conf = new MapConfiguration(map);
-        Configuration conf = new ConfigurationImpl(h2Conf);
+        Configuration conf = new ConfigurationImpl(null, h2Conf);
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
@@ -132,7 +132,7 @@ public class TestWithH2 {
                 "my.logStatements", "true"
         );
         MapConfiguration h2Conf = new MapConfiguration(map);
-        Configuration conf = new ConfigurationImpl(h2Conf);
+        Configuration conf = new ConfigurationImpl(null, h2Conf);
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
@@ -183,7 +183,7 @@ public class TestWithH2 {
                 "default.logStatements", "true"
         );
         MapConfiguration h2Conf = new MapConfiguration(map);
-        Configuration conf = new ConfigurationImpl(h2Conf);
+        Configuration conf = new ConfigurationImpl(null, h2Conf);
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);

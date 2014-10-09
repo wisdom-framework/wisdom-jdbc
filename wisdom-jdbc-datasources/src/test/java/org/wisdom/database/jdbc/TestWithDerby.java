@@ -71,7 +71,7 @@ public class TestWithDerby {
                 "default.logStatements", "true"
         );
         MapConfiguration derbyConf = new MapConfiguration(map);
-        Configuration conf = new ConfigurationImpl(derbyConf);
+        Configuration conf = new ConfigurationImpl(null, derbyConf);
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
@@ -114,7 +114,7 @@ public class TestWithDerby {
                 "default.logStatements", "true"
         );
         MapConfiguration derbyConf = new MapConfiguration(map);
-        Configuration conf = new ConfigurationImpl(derbyConf);
+        Configuration conf = new ConfigurationImpl(null, derbyConf);
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
