@@ -1,0 +1,21 @@
+Embed-Dependency: \
+    *:howl;inline=true, \
+    *:geronimo-transaction;inline=true;path=org/apache/geronimo/transaction/**/* \
+    *:geronimo-jpa_2.0_spec
+#TODO JTA
+Export-Package: \
+    javax.persistence;version=1.1;jpa=2.0, \
+    javax.persistence.criteria;version=1.1;jpa=2.0, \
+    javax.persistence.metamodel;version=1.1;jpa=2.0, \
+    javax.persistence.spi;version=1.1;jpa=2.0, \
+    javax.persistence;version=2.0;jpa=2.0, \
+    javax.persistence.criteria;version=2.0, \
+    javax.persistence.metamodel;version=2.0, \
+    javax.persistence.spi;version=2.0, \
+    org.wisdom.framework.jpa.model, \
+    org.wisdom.framework.jpa.accessor, \
+    org.wisdom.framework.transaction
+Import-Package: \
+    javax.resource.spi;resolution:=optional, \
+     !org.apache.geronimo.osgi.locator, \
+     *
