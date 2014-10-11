@@ -38,21 +38,33 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * Created by clement on 01/10/2014.
+ * The entry point of the JPA bridge.
+ * This component tracks bundles and check if they contain a {@code Meta-Persistence} header. If so, is creates a necessary persistence unit. By default, the tracker check for {@code META-INF/persistence.xml}
  */
 @Component(immediate = true)
 @Instantiate
 public class JPAManager {
 
-    private final static Pattern WORD = Pattern.compile("[a-zA-Z0-9]+");
+    /**
+     * The Meta-Persistence header.
+     */
     public static final String META_PERSISTENCE = "Meta-Persistence";
 
+    /**
+     * The logger.
+     */
     final static Logger LOGGER = LoggerFactory.getLogger(JPAManager.class);
 
+    /**
+     * The bundle context, used to register the tracker.
+     */
     @Context
     BundleContext context;
 
-    @Requires(filter = "(factory.name=org.wisdom.framework.jpa.PersistenceUnitInfoImpl)")
+    /**
+     * The factory used to create Persistence Unit 'instances'
+     */
+    @Requires(filter = "(factory.name=org.wisdom.framework.jpa.PersistenceUnitComponent)")
     Factory factory;
 
     /**
@@ -61,47 +73,63 @@ public class JPAManager {
     @Requires
     JPATransformer transformer;
 
-
+    /**
+     * The service exposed by the persistence provider.
+     * Right now, we support only one persistence provider at the same time.
+     */
     @Requires
     PersistenceProvider persistenceProvider;
 
+    /**
+     * The tracked bundle.
+     */
     BundleTracker<PersistentBundle> bundles;
 
 
     @Validate
     void start() throws Exception {
-
-        //
-        // Track bundles with persistence units.
-        //
-
+        // Track bundles.
         bundles = new BundleTracker<PersistentBundle>(context, Bundle.ACTIVE + Bundle.STARTING, null) {
 
+            /**
+             * A new bundle arrives, check whether or not it contains persistence unit.
+             * @param bundle the bundle
+             * @param event the event
+             * @return the Persistence Bundle object if the bundle contain PU, {@code null} if none (bundle not
+             * tracked)
+             */
             @Override
             public PersistentBundle addingBundle(Bundle bundle, BundleEvent event) {
                 try {
-                    //
-                    // Parse any persistence units, returns null (not tracked)
-                    // when there is no PU
-                    //
+                    // Parse any persistence units, returns null (not tracked) when there is no persistence unit
                     return parse(bundle);
                 } catch (Exception e) {
-                    LOGGER.error("While parsing bundle {} for a persistence unit we encountered an unexpected exception" +
-                                    " {}. This bundle (also the other persistence units in this bundle) will be ignored.",
+                    LOGGER.error("While parsing bundle {} for a persistence unit we encountered " +
+                                    "an unexpected exception {}. This bundle (also the other persistence " +
+                                    "units in this bundle) will be ignored.",
                             bundle, e.getMessage(), e);
                     return null;
                 }
             }
 
+            /**
+             * A bundle is leaving.
+             * @param bundle the bundle
+             * @param event the event
+             * @param pu the persistent bundle
+             */
             @Override
-            public void removedBundle(Bundle bundle, BundleEvent event, PersistentBundle put) {
-                put.destroy();
+            public void removedBundle(Bundle bundle, BundleEvent event, PersistentBundle pu) {
+                pu.destroy();
             }
         };
 
         bundles.open();
     }
 
+    /**
+     * Closes the tracker.
+     */
     @Invalidate
     void stop() {
         bundles.close();
@@ -129,36 +157,37 @@ public class JPAManager {
         String metapersistence = bundle.getHeaders().get(META_PERSISTENCE);
 
         if (metapersistence == null || metapersistence.trim().isEmpty()) {
-            return null;
+            // Check default location
+            if (bundle.getResource("META-INF/persistence.xml") != null) {
+                // Found at the default location
+                metapersistence = "META-INF/persistence.xml";
+            } else {
+                return null;
+            }
         }
         LOGGER.info("META_PERSISTENCE header found in bundle {} : {}", bundle.getBundleId(), metapersistence);
 
 
-        //
         // We can have multiple persistence units.
-        //
-
         Set<Persistence.PersistenceUnit> set = new HashSet<>();
         for (String location : Splitter.on(",").omitEmptyStrings().trimResults().splitToList(metapersistence)) {
             LOGGER.info("Analysing location {}", location);
-            Persistence.PersistenceUnit.Properties.Property p = new Persistence.PersistenceUnit.Properties.Property();
+            Persistence.PersistenceUnit.Properties.Property p =
+                    new Persistence.PersistenceUnit.Properties.Property();
 
-            //
             // Lets remember where we came from
-            //
             p.setName("location");
             p.setValue(location);
 
-            //
             // Try to find the resource for the persistence unit
             // on the classpath: getResource
-            //
 
             URL url = bundle.getResource(location);
             if (url == null) {
-                LOGGER.error("Bundle {} specifies location '{}' in the Meta-Persistence header but no such resource is" +
-                        " found in the bundle at that location.", bundle, location);
+                LOGGER.error("Bundle {} specifies location '{}' in the Meta-Persistence header but no such" +
+                        " resource is found in the bundle at that location.", bundle, location);
             } else {
+                // Parse the XML file.
                 Persistence persistence = JAXB.unmarshal(url, Persistence.class);
                 LOGGER.info("Parsed persistence: {}, unit {}", persistence, persistence.getPersistenceUnit());
                 for (Persistence.PersistenceUnit pu : persistence.getPersistenceUnit()) {

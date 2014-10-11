@@ -51,7 +51,7 @@ import java.util.*;
  */
 @Component
 @Provides
-public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
+public class PersistenceUnitComponent implements PersistenceUnitInfo {
 
     private static final String OSGI_UNIT_PROVIDER = "osgi.unit.provider";
     private static final String OSGI_UNIT_VERSION = "osgi.unit.version";
@@ -98,12 +98,13 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
      * @param bundle the source bundle
      * @param xml    The xml of the persistence unit
      */
-    PersistenceUnitInfoImpl(@Property(name = "bundle") PersistentBundle bundle,
-                            @Property(name = "unit") Persistence.PersistenceUnit xml,
-                            @Context BundleContext context) throws Exception {
+    PersistenceUnitComponent(@Property(name = "bundle") PersistentBundle bundle,
+                             @Property(name = "unit") Persistence.PersistenceUnit xml,
+                             @Context BundleContext context) throws Exception {
         this.sourceBundle = bundle;
         this.persistenceUnitXml = xml;
         this.bundleContext = context;
+        // Retrieve the location set while parsing the persistence unit.
         this.location = (String) getProperties().get("location");
     }
 
@@ -126,13 +127,15 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
     @Validate
     public void start() {
         Map<String, Object> map = new HashMap<>();
-        for (Persistence.PersistenceUnit.Properties.Property p : persistenceUnitXml.getProperties().getProperty()) {
+        for (Persistence.PersistenceUnit.Properties.Property p :
+                persistenceUnitXml.getProperties().getProperty()) {
             map.put(p.getName(), p.getValue());
         }
 
         if (isOpenJPA()) {
-            System.out.println("Adding managed runtime for open jpa");
-            map.put("openjpa.ManagedRuntime", "invocation(TransactionManagerMethod=org.wisdom.framework.jpa.accessor.TransactionManagerAccessor.get)");
+            map.put("openjpa.ManagedRuntime",
+                    "invocation(TransactionManagerMethod=org.wisdom.framework.jpa.accessor" +
+                            ".TransactionManagerAccessor.get)");
         }
 
 
@@ -151,12 +154,10 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
             EntityManagerFactory emf = provider.createContainerEntityManagerFactory(this, map);
             emfRegistration = bundleContext.registerService(EntityManagerFactory.class, emf, properties);
 
-            System.out.println("Registering regular entity manager");
             emRegistration = bundleContext.registerService(EntityManager.class,
                     emf.createEntityManager(), properties);
         } else {
             // JTA
-            System.out.println("Registering JTA entity manager");
             EntityManagerFactory emf = provider.createContainerEntityManagerFactory(this, map);
             emRegistration = bundleContext.registerService(EntityManager.class,
                     new TransactionalEntityManager(transactionManager, emf, this), properties);
@@ -169,7 +170,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
     }
 
     /**
-     * Add a new transformer. SPEC: can this be called multiple times?
+     * Add a new transformer.
      *
      * @see javax.persistence.spi.PersistenceUnitInfo#addTransformer(javax.persistence.spi.ClassTransformer)
      */
@@ -250,7 +251,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
      * class loader is used BEFORE any bundle's classes are loaded since a class
      * loader does parent delegation first. Sigh, guess it works most of the
      * time. There is however, no good alternative though in OSGi we could
-     * actually refresh the bundle. TODO solve this ordering problem
+     * actually refresh the bundle.
      *
      * @see javax.persistence.spi.PersistenceUnitInfo#getNewTempClassLoader()
      */
@@ -258,19 +259,16 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
     public ClassLoader getNewTempClassLoader() {
 
         return new ClassLoader(getClassLoader()) {
-
-            //
-            // Use the bunde's resource interface to get the
-            // bytes of the classes and define them in this
-            // loader. Yuck.
-            //
+            /**
+             * Searchs for the .class file and define it using the current class loader.
+             * @param className the class name
+             * @return the class object
+             * @throws ClassNotFoundException if the class cannot be found
+             */
             @Override
             protected Class<?> findClass(String className) throws ClassNotFoundException {
 
-                //
                 // Use path of class, then get the resource
-                //
-
                 String path = className.replace('.', '/').concat(".class");
                 URL resource = getParent().getResource(path);
                 if (resource == null)
@@ -286,15 +284,21 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
                 }
             }
 
-            //
-            // Look for resources in our bundle
-            //
-
+            /**
+             * Finds a resource in the bundle.
+             * @param resource the resource
+             * @return the url of the resource from the bundle, {@code null} if not found.
+             */
             @Override
             protected URL findResource(String resource) {
                 return getParent().getResource(resource);
             }
 
+            /**
+             * Finds resources in the bundle.
+             * @param resource the resource
+             * @return the url of the resources from the bundle, empty if not found.
+             */
             @Override
             protected Enumeration<URL> findResources(String resource) throws IOException {
                 return getParent().getResources(resource);
@@ -393,8 +397,9 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
      */
     @Override
     public PersistenceUnitTransactionType getTransactionType() {
-        if (persistenceUnitXml.getTransactionType() == org.wisdom.framework.jpa.model.PersistenceUnitTransactionType
-                .RESOURCE_LOCAL) {
+        if (persistenceUnitXml.getTransactionType() ==
+                org.wisdom.framework.jpa.model.PersistenceUnitTransactionType
+                        .RESOURCE_LOCAL) {
             return PersistenceUnitTransactionType.RESOURCE_LOCAL;
         } else {
             return PersistenceUnitTransactionType.JTA;
@@ -407,8 +412,9 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
     @Override
     public ValidationMode getValidationMode() {
         PersistenceUnitValidationModeType validationMode = persistenceUnitXml.getValidationMode();
-        if (validationMode == null)
+        if (validationMode == null) {
             return null;
+        }
 
         return ValidationMode.valueOf(validationMode.name());
     }

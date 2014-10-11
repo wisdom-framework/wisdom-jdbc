@@ -40,13 +40,13 @@ class TransactionalEntityManager implements EntityManager {
 
     private final TransactionManager transactionManager;
     private final EntityManagerFactory entityManagerFactory;
-    private final PersistenceUnitInfoImpl unit;
+    private final PersistenceUnitComponent unit;
     final ThreadLocal<EntityManager> perThreadEntityManager = new ThreadLocal<>();
     volatile boolean open = true;
 
     //TODO Manage transaction manager in the request scope.
 
-    public TransactionalEntityManager(TransactionManager tm, EntityManagerFactory emf, PersistenceUnitInfoImpl unit) {
+    public TransactionalEntityManager(TransactionManager tm, EntityManagerFactory emf, PersistenceUnitComponent unit) {
         this.transactionManager = tm;
         this.entityManagerFactory = emf;
         this.unit = unit;

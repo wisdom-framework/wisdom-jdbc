@@ -24,11 +24,14 @@ import org.wisdom.framework.transaction.impl.TransactionManagerService;
 import javax.transaction.TransactionManager;
 
 /**
- * Created by clement on 07/10/2014.
+ * A class used to retrieve the Transaction Manager.
+ * This class is used by OpenJPA to retrieve the transaction manager.
  */
 public class TransactionManagerAccessor {
 
-
+    /**
+     * @return the transaction manager.
+     */
     public static TransactionManager get() {
         return TransactionManagerService.get();
     }

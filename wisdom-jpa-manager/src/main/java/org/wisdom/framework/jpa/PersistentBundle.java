@@ -27,22 +27,32 @@ import org.wisdom.database.jdbc.service.DataSources;
 import org.wisdom.framework.jpa.model.Persistence;
 
 import javax.sql.DataSource;
-import java.util.*;
+import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Set;
 
 /**
- * This class represents a bundle with one or more valid Persistence Units. It
- * maintains a the service registrations for the TransactionalEntityManager for
- * each persistence units and closes them when applicable.
+ * This class represents a bundle with one or more valid Persistence Units. It computes the instance configuration to use to create the instance that will handle the persistence units.
  */
 class PersistentBundle {
 
-
+    /**
+     * The set of created instance.
+     */
     private final Set<ComponentInstance> instances = new HashSet<>();
 
+    /**
+     * The bundle object.
+     */
     final Bundle bundle;
+    /**
+     * The factory to use.
+     */
     private final Factory factory;
 
     final static Logger LOGGER = LoggerFactory.getLogger(PersistentBundle.class);
+
     /**
      * We found some persistence units for this bridge so create this manager.
      *
@@ -61,6 +71,9 @@ class PersistentBundle {
         }
     }
 
+    /**
+     * Disposes the created instances.
+     */
     public void destroy() {
         for (ComponentInstance instance : instances) {
             instance.dispose();
@@ -68,6 +81,17 @@ class PersistentBundle {
         instances.clear();
     }
 
+    /**
+     * Creates the component instance for the given unit.
+     * This function computes the filters to retrieve the data sources. If a data source is not set in inject a
+     * filter that will never match.
+     *
+     * @param unit the persistence unit
+     * @return the created instance
+     * @throws MissingHandlerException   the instance cannot be created because of a missing handler
+     * @throws UnacceptableConfiguration the configuration if invalid.
+     * @throws ConfigurationException    the configuration is rejected.
+     */
     private ComponentInstance createUnitInstance(Persistence.PersistenceUnit unit) throws MissingHandlerException,
             UnacceptableConfiguration, ConfigurationException {
         LOGGER.info("Creating persistence unit instance for unit {}", unit.getName());
@@ -82,14 +106,14 @@ class PersistentBundle {
         return factory.createComponentInstance(configuration);
     }
 
-    private String createDataSourceFilter(String name) {
+    static String createDataSourceFilter(String name) {
         if (name == null) {
             return "(" + DataSources.DATASOURCE_NAME_PROPERTY + "= not-set)";
         }
         if (name.startsWith("osgi:service/" + DataSource.class.getName() + "/")) {
             return name.substring(("osgi:service/" + DataSource.class.getName() + "/").length());
         }
-        if (name.startsWith("(")  && name.endsWith(")")) {
+        if (name.startsWith("(") && name.endsWith(")")) {
             return name;
         }
         return "(" + DataSources.DATASOURCE_NAME_PROPERTY + "=" + name + ")";
