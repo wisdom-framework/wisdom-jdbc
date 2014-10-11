@@ -140,7 +140,8 @@ public class TransactionManagerService {
         }
         // Create transaction manager
         try {
-            transactionManager = new TransactionManagerImpl(transactionTimeout, xidFactory, transactionLog);
+            // Because of OpenJPA, we store it in a static field (we need a way to retrieve it from a static method).
+            transactionManager = new TransactionManagerImpl(transactionTimeout, xidFactory, transactionLog); //NOSONAR
         } catch (XAException e) {
             throw new IllegalStateException("Cannot instantiate the transaction manager", e);
         }
