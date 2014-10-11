@@ -197,10 +197,10 @@ public class OpenJPAEnhancerMojo extends AbstractWisdomWatcherMojo {
      * This is the main trigger for the <code>Mojo</code> inside the <code>Maven</code> system, and allows
      * the <code>Mojo</code> to communicate errors.
      *
-     * @throws org.apache.maven.plugin.MojoExecutionException if an unexpected problem occurs.
-     *                                                        Throwing this exception causes a "BUILD ERROR" message to be displayed.
-     * @throws org.apache.maven.plugin.MojoFailureException   if an expected problem (such as a compilation failure) occurs.
-     *                                                        Throwing this exception causes a "BUILD FAILURE" message to be displayed.
+     * @throws org.apache.maven.plugin.MojoExecutionException if an unexpected problem occurs. Throwing this
+     * exception causes a "BUILD ERROR" message to be displayed.
+     * @throws org.apache.maven.plugin.MojoFailureException   if an expected problem (such as a compilation
+     * failure) occurs. Throwing this exception causes a "BUILD FAILURE" message to be displayed.
      */
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -314,7 +314,7 @@ public class OpenJPAEnhancerMojo extends AbstractWisdomWatcherMojo {
                 new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
 
         // set the new ClassLoader as default for this Thread
-        //TODO this should be reverted at some points.
+        // will be reverted in the caller method.
         Thread.currentThread().setContextClassLoader(jpaRealm);
     }
 
@@ -394,11 +394,17 @@ public class OpenJPAEnhancerMojo extends AbstractWisdomWatcherMojo {
 
         boolean ok;
 
-        if (!tmpClassLoader) {
-            extendRealmClasspath();
-        }
+        final ClassLoader original = Thread.currentThread().getContextClassLoader();
+        try {
+            if (!tmpClassLoader) {
+                extendRealmClasspath();
+            }
 
-        ok = PCEnhancer.run(args, opts);
+            ok = PCEnhancer.run(args, opts);
+        } finally {
+            // We may have change the TCCL, restore the original one
+            Thread.currentThread().setContextClassLoader(original);
+        }
 
         if (!ok) {
             throw new MojoExecutionException("The OpenJPA Enhancer tool detected an error, check log");
