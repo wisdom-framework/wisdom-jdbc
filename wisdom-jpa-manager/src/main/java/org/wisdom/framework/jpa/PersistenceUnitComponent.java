@@ -176,12 +176,8 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
      */
     @Override
     public void addTransformer(ClassTransformer transformer) {
-        try {
-            this.transformer.register(sourceBundle.bundle, transformer);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            throw e;
-        }
+        this.transformer.register(sourceBundle.bundle, transformer);
+
     }
 
     /*
