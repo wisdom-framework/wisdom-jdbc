@@ -272,7 +272,12 @@ public class HowlLog implements TransactionLog {
         }
 
         public void onRecord(LogRecord plainlr) {
-            XALogRecord lr = (XALogRecord) plainlr;
+            XALogRecord lr = null;
+            if (plainlr instanceof XALogRecord) {
+                lr = (XALogRecord) plainlr;
+            } else {
+                throw new IllegalStateException("The record is not a " + XALogRecord.class.getName());
+            }
             short recordType = lr.type;
             XACommittingTx tx = lr.getTx();
             if (recordType == LogRecordType.XACOMMIT) {
