@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Created by clement on 07/10/2014.
+ * A Mojo enhancing entity classes for OpenJPA.
  */
 @Mojo(name = "enhance-entities", threadSafe = false,
         requiresDependencyResolution = ResolutionScope.COMPILE,
@@ -271,19 +271,21 @@ public class OpenJPAEnhancerMojo extends AbstractWisdomWatcherMojo {
         return fileCreated(file);
     }
 
-    private void ensurePersistenceXml() throws MojoExecutionException {
+    private File ensurePersistenceXml() throws MojoExecutionException {
         if (persistenceXmlFile != null) {
             File persistence = new File(project.getBasedir(), persistenceXmlFile);
             if (!persistence.isFile()) {
                 throw new MojoExecutionException("Cannot find the custom persistence xml file - " +
                         persistence.getAbsolutePath() + " is not a file");
             }
+            return persistence;
         } else {
             File persistence = new File(buildDirectory, "classes/META-INF/persistence.xml");
             if (!persistence.isFile()) {
                 throw new MojoExecutionException("Cannot find the persistence xml file - " +
                         persistence.getAbsolutePath() + " is not a file");
             }
+            return persistence;
         }
     }
 
@@ -354,13 +356,13 @@ public class OpenJPAEnhancerMojo extends AbstractWisdomWatcherMojo {
      * @return populated Options
      */
     protected Options getOptions() throws MojoExecutionException {
-        ensurePersistenceXml();
+        File persistence = ensurePersistenceXml();
 
         Options opts = new Options();
         if (toolProperties != null) {
             opts.putAll(toolProperties);
         }
-        opts.put(OPTION_PROPERTIES_FILE, persistenceXmlFile);
+        opts.put(OPTION_PROPERTIES_FILE, persistence.getAbsolutePath());
 
         if (connectionDriverName != null) {
             opts.put(OPTION_CONNECTION_DRIVER_NAME, connectionDriverName);
