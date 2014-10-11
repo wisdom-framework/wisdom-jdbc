@@ -151,7 +151,7 @@ public class JPATransformer implements WeavingHook {
             //
             // Get the import clauses
             //
-            Clauses clauses = Clauses.parse(bundle.getHeaders().get(Constants.EXPORT_PACKAGE), null);
+            Clauses clauses = Clauses.parse(bundle.getHeaders().get(Constants.EXPORT_PACKAGE));
             if (!clauses.isEmpty()) {
                 List<String> list = new ArrayList<>();
                 for (Map.Entry<String, Map<String, String>> e : clauses.entrySet()) {

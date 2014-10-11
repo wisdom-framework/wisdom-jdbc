@@ -19,33 +19,51 @@
  */
 package org.wisdom.framework.osgi;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by clement on 02/10/2014.
+ * A tokenizer used to parse manifest header.
+ * Taken from BND code.
  */
 public class QuotedTokenizer {
     String string;
     int index = 0;
     String separators;
     boolean returnTokens;
-    boolean ignoreWhiteSpace = true;
     String peek;
     char separator;
 
+    /**
+     * Creates a tokenizer.
+     * @param string the string to parse
+     * @param separators the separators
+     * @param returnTokens whether or not tokens are returned
+     */
     public QuotedTokenizer(String string, String separators, boolean returnTokens) {
-        if (string == null)
-            throw new IllegalArgumentException("string argument must be not null");
-        this.string = string;
+        this.string = Preconditions.checkNotNull(string);
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(separators));
         this.separators = separators;
         this.returnTokens = returnTokens;
     }
 
+    /**
+     * Creates a tokenizer.
+     * @param string the string to parse
+     * @param separators the separators
+     */
     public QuotedTokenizer(String string, String separators) {
         this(string, separators, false);
     }
 
+    /**
+     * Retrieve next token.
+     * @param separators the separators
+     * @return the next token.
+     */
     public String nextToken(String separators) {
         separator = 0;
         if (peek != null) {
@@ -54,8 +72,9 @@ public class QuotedTokenizer {
             return tmp;
         }
 
-        if (index == string.length())
+        if (index == string.length()) {
             return null;
+        }
 
         StringBuilder sb = new StringBuilder();
 
@@ -106,6 +125,10 @@ public class QuotedTokenizer {
         return result;
     }
 
+    /**
+     * Retrieves next token.
+     * @return the token
+     */
     public String nextToken() {
         return nextToken(separators);
     }
@@ -126,31 +149,12 @@ public class QuotedTokenizer {
         }
     }
 
-    public String[] getTokens() {
-        return getTokens(0);
-    }
 
-    private String[] getTokens(int cnt) {
-        String token = nextToken();
-        if (token == null)
-            return new String[cnt];
-
-        String result[] = getTokens(cnt + 1);
-        result[cnt] = token;
-        return result;
-    }
-
+    /**
+     * Gets the current separator
+     * @return the separator.
+     */
     public char getSeparator() {
         return separator;
-    }
-
-    public List<String> getTokenSet() {
-        List<String> list = new ArrayList<>();
-        String token = nextToken();
-        while (token != null) {
-            list.add(token);
-            token = nextToken();
-        }
-        return list;
     }
 }
