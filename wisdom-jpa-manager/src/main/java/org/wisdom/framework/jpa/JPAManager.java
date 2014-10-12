@@ -74,13 +74,6 @@ public class JPAManager {
     JPATransformer transformer;
 
     /**
-     * The service exposed by the persistence provider.
-     * Right now, we support only one persistence provider at the same time.
-     */
-    @Requires
-    PersistenceProvider persistenceProvider;
-
-    /**
      * The tracked bundle.
      */
     BundleTracker<PersistentBundle> bundles;

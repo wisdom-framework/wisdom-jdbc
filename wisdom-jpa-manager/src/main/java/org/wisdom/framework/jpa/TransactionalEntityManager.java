@@ -66,12 +66,9 @@ class TransactionalEntityManager implements EntityManager {
             throw new IllegalStateException("The JPA bridge has closed");
         }
 
-
         try {
 
-            //
             // Do we already have one on this thread?
-            //
 
             EntityManager em = perThreadEntityManager.get();
             if (em != null) {
@@ -79,17 +76,13 @@ class TransactionalEntityManager implements EntityManager {
             }
 
 
-            //
             // Nope, so we need to check if there actually is a transaction
-            //
             final Transaction transaction = transactionManager.getTransaction();
             if (transaction == null) {
                 throw new TransactionRequiredException("Cannot create an EM since no transaction active");
             }
 
-            //
             // Ok, now we can create one since we can also close it.
-            //
             final Thread transactionThread = Thread.currentThread();
 
             em = entityManagerFactory.createEntityManager();
@@ -98,9 +91,7 @@ class TransactionalEntityManager implements EntityManager {
             if ("managed".equalsIgnoreCase(unit.getProperties().getProperty("openjpa.TransactionMode"))) {
 
                 try {
-                    //
                     // Register a callback at the end of the transaction
-                    //
                     transaction.registerSynchronization(new Synchronization() {
 
                         @Override

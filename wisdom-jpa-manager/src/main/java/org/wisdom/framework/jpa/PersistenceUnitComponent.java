@@ -44,10 +44,9 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * This class is the interface between the bridge (the manager) and the
- * Persistence Provider. It is used by the Persistence Provider to get all
- * context information. We create one of these for each persistence unit found
- * in a bundle.
+ * This class is the interface between the bridge (the manager) and the Persistence Provider.
+ * It is used by the Persistence Provider to get all context information. We create one
+ * instance of these for each persistence unit found in a bundle.
  */
 @Component
 @Provides
@@ -71,26 +70,36 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
      * Filter injected in the instance configuration.
      */
     @Requires(optional = true, proxy = false, nullable = false, id = "jta-ds")
-    private DataSource jtadatasource;
+    DataSource jtaDataSource;
 
     /**
      * Filter injected in the instance configuration.
      */
     @Requires(optional = true, proxy = false, nullable = false, id = "ds")
-    private DataSource nonjtadatasource;
+    DataSource nonJtaDataSource;
 
+    /**
+     * The transformer.
+     */
     @Requires
     JPATransformer transformer;
 
+    /**
+     * The service exposed by JPA provider.
+     * Only one provider is supported.
+     */
     @Requires(proxy = false)
     PersistenceProvider provider;
 
+    /**
+     * Transaction manager.
+     */
     @Requires
     TransactionManager transactionManager;
 
 
-    private ServiceRegistration<EntityManager> emRegistration;
-    private ServiceRegistration<EntityManagerFactory> emfRegistration;
+    ServiceRegistration<EntityManager> emRegistration;
+    ServiceRegistration<EntityManagerFactory> emfRegistration;
 
     /**
      * Create a new Persistence Unit Info
@@ -177,7 +186,6 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
     @Override
     public void addTransformer(ClassTransformer transformer) {
         this.transformer.register(sourceBundle.bundle, transformer);
-
     }
 
     /*
@@ -221,7 +229,7 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
      */
     @Override
     public synchronized DataSource getJtaDataSource() {
-        return jtadatasource;
+        return jtaDataSource;
     }
 
     /*
@@ -311,7 +319,7 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
      */
     @Override
     public DataSource getNonJtaDataSource() {
-        return nonjtadatasource;
+        return nonJtaDataSource;
     }
 
     /*

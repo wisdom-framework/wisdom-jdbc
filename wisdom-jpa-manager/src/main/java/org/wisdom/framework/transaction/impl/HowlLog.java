@@ -37,12 +37,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * An implementation of the Geronimo Transaction Log based on OW2 Howl.
+ * Configuration is documented in the <a href="http://howl.ow2.org/jdoc/public/index.html">Howl API</a>.
+ */
 public class HowlLog implements TransactionLog {
-    //these are used as debugging aids only
     private static final byte COMMIT = 2;
     private static final byte ROLLBACK = 3;
 
-    private static final Logger log = LoggerFactory.getLogger(HOWLLog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HOWLLog.class);
 
     private File serverBaseDir;
     private String logFileDir;
@@ -54,6 +57,28 @@ public class HowlLog implements TransactionLog {
     private boolean started = false;
     private Map<Xid, Recovery.XidBranchesPair> recovered;
 
+    /**
+     * Creates the HowLog instance
+     *
+     * @param bufferClassName              the buffer class name
+     * @param bufferSize                   the buffer size
+     * @param checksumEnabled              whether or not checksum is enabled
+     * @param adler32Checksum              whether or not the Adler 32 checksum algorithm should be used
+     * @param flushSleepTimeMilliseconds   the time in ms the flush manager should sleep
+     * @param logFileDir                   the directory of the log file
+     * @param logFileExt                   the log file extension
+     * @param logFileName                  the log file name
+     * @param maxBlocksPerFile             the maximum number of block in a file
+     * @param maxBuffers                   the max buffer
+     * @param maxLogFiles                  the max number of file
+     * @param minBuffers                   the min buffer
+     * @param threadsWaitingForceThreshold the thread waiting threshold
+     * @param flushPartialBuffers          whether or not partial buffer are flushed
+     * @param xidFactory                   the XidFactory
+     * @param serverBaseDir                the server directory
+     * @throws IOException               when the logger cannot be created
+     * @throws LogConfigurationException when the configuration is invalid
+     */
     public HowlLog(String bufferClassName,
                    int bufferSize,
                    boolean checksumEnabled,
@@ -71,25 +96,29 @@ public class HowlLog implements TransactionLog {
                    XidFactory xidFactory,
                    File serverBaseDir) throws IOException, LogConfigurationException {
         this.serverBaseDir = serverBaseDir;
-        setBufferClassName(bufferClassName);
-        setBufferSizeKBytes(bufferSize);
-        setChecksumEnabled(checksumEnabled);
-        setAdler32Checksum(adler32Checksum);
-        setFlushSleepTimeMilliseconds(flushSleepTimeMilliseconds);
-        //setLogFileDir(logFileDir);
+        configuration.setBufferClassName(bufferClassName);
+        configuration.setBufferSize(bufferSize);
+        configuration.setChecksumEnabled(checksumEnabled);
+        configuration.setAdler32Checksum(adler32Checksum);
+        configuration.setFlushSleepTime(flushSleepTimeMilliseconds);
         this.logFileDir = logFileDir;
-        setLogFileExt(logFileExt);
-        setLogFileName(logFileName);
-        setMaxBlocksPerFile(maxBlocksPerFile);
-        setMaxBuffers(maxBuffers);
-        setMaxLogFiles(maxLogFiles);
-        setMinBuffers(minBuffers);
-        setThreadsWaitingForceThreshold(threadsWaitingForceThreshold);
-        setFlushPartialBuffers(flushPartialBuffers);
+        configuration.setLogFileExt(logFileExt);
+        configuration.setLogFileName(logFileName);
+        configuration.setMaxBlocksPerFile(maxBlocksPerFile == -1 ? Integer.MAX_VALUE : maxBlocksPerFile);
+        configuration.setMaxBuffers(maxBuffers);
+        configuration.setMaxLogFiles(maxLogFiles);
+        configuration.setMinBuffers(minBuffers);
+        configuration.setThreadsWaitingForceThreshold(
+                threadsWaitingForceThreshold == -1 ? Integer.MAX_VALUE : threadsWaitingForceThreshold);
+        configuration.setFlushPartialBuffers(flushPartialBuffers);
         this.xidFactory = xidFactory;
         this.logger = new XALogger(configuration);
     }
 
+    /**
+     * Sets the log dir.
+     * @param logDirName the directory name
+     */
     public void setLogFileDir(String logDirName) {
         File logDir = new File(logDirName);
         if (!logDir.isAbsolute()) {
@@ -102,62 +131,14 @@ public class HowlLog implements TransactionLog {
         }
     }
 
-    public void setLogFileExt(String logFileExt) {
-        configuration.setLogFileExt(logFileExt);
-    }
-
-    public void setLogFileName(String logFileName) {
-        configuration.setLogFileName(logFileName);
-    }
-
-    public void setChecksumEnabled(boolean checksumOption) {
-        configuration.setChecksumEnabled(checksumOption);
-    }
-
-    public void setAdler32Checksum(boolean checksumOption) {
-        configuration.setAdler32Checksum(checksumOption);
-    }
-
-    public void setBufferSizeKBytes(int bufferSize) throws LogConfigurationException {
-        configuration.setBufferSize(bufferSize);
-    }
-
-    public void setBufferClassName(String bufferClassName) {
-        configuration.setBufferClassName(bufferClassName);
-    }
-
-    public void setMaxBuffers(int maxBuffers) throws LogConfigurationException {
-        configuration.setMaxBuffers(maxBuffers);
-    }
-
-    public void setMinBuffers(int minBuffers) throws LogConfigurationException {
-        configuration.setMinBuffers(minBuffers);
-    }
-
-    public void setFlushSleepTimeMilliseconds(int flushSleepTime) {
-        configuration.setFlushSleepTime(flushSleepTime);
-    }
-
-    public void setThreadsWaitingForceThreshold(int threadsWaitingForceThreshold) {
-        configuration.setThreadsWaitingForceThreshold(threadsWaitingForceThreshold == -1 ? Integer.MAX_VALUE : threadsWaitingForceThreshold);
-    }
-
-    public void setMaxBlocksPerFile(int maxBlocksPerFile) {
-        configuration.setMaxBlocksPerFile(maxBlocksPerFile == -1 ? Integer.MAX_VALUE : maxBlocksPerFile);
-    }
-
-    public void setMaxLogFiles(int maxLogFiles) {
-        configuration.setMaxLogFiles(maxLogFiles);
-    }
-
-    public void setFlushPartialBuffers(boolean flushPartialBuffers) {
-        configuration.setFlushPartialBuffers(flushPartialBuffers);
-    }
-
-    public void doStart() throws Exception {
+    /**
+     * Starts the logger.
+     * @throws Exception cannot be started
+     */
+    public void start() throws Exception {
         started = true;
         setLogFileDir(logFileDir);
-        log.debug("Initiating transaction manager recovery");
+        LOGGER.debug("Initiating transaction manager recovery");
         recovered = new HashMap<>();
 
         logger.open(null);
@@ -165,18 +146,34 @@ public class HowlLog implements TransactionLog {
         ReplayListener replayListener = new GeronimoReplayListener(xidFactory, recovered);
         logger.replayActiveTx(replayListener);
 
-        log.debug("In doubt transactions recovered from log");
+        LOGGER.debug("In doubt transactions recovered from log");
     }
 
-    public void doStop() throws Exception {
+    /**
+     * Stops the logger.
+     * @throws Exception cannot be stopped
+     */
+    public void stop() throws Exception {
         started = false;
         logger.close();
         recovered = null;
     }
 
-    public void begin(Xid xid) throws LogException {
+    /**
+     * Begins a transaction.
+     * @param xid the id
+     */
+    public void begin(Xid xid) {
+        // Do nothing.
     }
 
+    /**
+     * Prepares a transaction
+     * @param xid the id
+     * @param branches  the branches
+     * @return the log mark to use in commit/rollback calls.
+     * @throws LogException on error
+     */
     public Object prepare(Xid xid, List<? extends TransactionBranchInfo> branches) throws LogException {
         int branchCount = branches.size();
         byte[][] data = new byte[3 + 2 * branchCount][];
@@ -197,6 +194,12 @@ public class HowlLog implements TransactionLog {
         }
     }
 
+    /**
+     * Commits a transaction
+     * @param xid the id
+     * @param logMark the mark
+     * @throws LogException on error
+     */
     public void commit(Xid xid, Object logMark) throws LogException {
         //the data is theoretically unnecessary but is included to help with debugging
         // and because HOWL currently requires it.
@@ -212,6 +215,12 @@ public class HowlLog implements TransactionLog {
         }
     }
 
+    /**
+     * Rollback a transaction.
+     * @param xid the id
+     * @param logMark the mark
+     * @throws LogException on error
+     */
     public void rollback(Xid xid, Object logMark) throws LogException {
         //the data is theoretically unnecessary but is included to help
         // with debugging and because HOWL currently requires it.
@@ -227,25 +236,37 @@ public class HowlLog implements TransactionLog {
         }
     }
 
+    /**
+     * Recovers the log, returning a map of (top level) xid to List of TransactionBranchInfo for the branches.
+     * Uses the XidFactory to reconstruct the xids.
+     *
+     * @param xidFactory Xid factory
+     * @return Map of recovered xid to List of TransactionBranchInfo representing the branches.
+     * @throws LogException on error
+     */
     public Collection<Recovery.XidBranchesPair> recover(XidFactory xidFactory) throws LogException {
-        log.debug("Initiating transaction manager recovery");
+        LOGGER.debug("Initiating transaction manager recovery");
         Map<Xid, Recovery.XidBranchesPair> recovered = new HashMap<>();
         ReplayListener replayListener = new GeronimoReplayListener(xidFactory, recovered);
         logger.replayActiveTx(replayListener);
-        log.debug("In doubt transactions recovered from log");
+        LOGGER.debug("In doubt transactions recovered from log");
         return recovered.values();
     }
 
+    /**
+     * Retrieves statistics
+     * @return the statistics as XML.
+     */
     public String getXMLStats() {
         return logger.getStats();
     }
 
     public int getAverageForceTime() {
-        return 0;//logger.getAverageForceTime();
+        return 0;
     }
 
     public int getAverageBytesPerForce() {
-        return 0;//logger.getAverageBytesPerForce();
+        return 0;
     }
 
     private byte[] intToBytes(int formatId) {
@@ -292,7 +313,7 @@ public class HowlLog implements TransactionLog {
 
                 Recovery.XidBranchesPair xidBranchesPair = new Recovery.XidBranchesPair(masterXid, tx);
                 recoveredTx.put(masterXid, xidBranchesPair);
-                log.debug("recovered prepare record for master xid: " + masterXid);
+                LOGGER.debug("recovered prepare record for master xid: " + masterXid);
                 for (int i = 3; i < data.length; i += 2) {
                     byte[] branchBranchId = data[i];
                     String name = new String(data[i + 1]);
@@ -300,17 +321,17 @@ public class HowlLog implements TransactionLog {
                     Xid branchXid = xidFactory.recover(formatId, globalId, branchBranchId);
                     TransactionBranchInfoImpl branchInfo = new TransactionBranchInfoImpl(branchXid, name);
                     xidBranchesPair.addBranch(branchInfo);
-                    log.debug("recovered branch for resource manager, branchId " + name + ", " + branchXid);
+                    LOGGER.debug("recovered branch for resource manager, branchId " + name + ", " + branchXid);
                 }
             } else {
                 if (recordType != LogRecordType.END_OF_LOG) { // This value crops up every time the server is started
-                    log.warn("Received unexpected log record: " + lr + " (" + recordType + ")");
+                    LOGGER.warn("Received unexpected log record: " + lr + " (" + recordType + ")");
                 }
             }
         }
 
         public void onError(org.objectweb.howl.log.LogException exception) {
-            log.error("Error during recovery: ", exception);
+            LOGGER.error("Error during recovery: ", exception);
         }
 
         public LogRecord getLogRecord() {

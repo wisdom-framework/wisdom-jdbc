@@ -19,7 +19,6 @@
  */
 package org.wisdom.framework.transaction.impl;
 
-import com.google.common.base.Strings;
 import org.apache.felix.ipojo.annotations.*;
 import org.apache.geronimo.transaction.log.UnrecoverableLog;
 import org.apache.geronimo.transaction.manager.*;
@@ -130,7 +129,7 @@ public class TransactionManagerService {
                         flushPartialBuffers,
                         xidFactory,
                         null);
-                ((HowlLog) transactionLog).doStart();
+                ((HowlLog) transactionLog).start();
             } catch (Exception e) {
                 // This should not really happen as we've checked properties earlier
                 throw new IllegalArgumentException("Cannot instantiate the transaction log", e);
@@ -167,7 +166,7 @@ public class TransactionManagerService {
         }
 
         if (transactionLog instanceof HowlLog) {
-            ((HowlLog) transactionLog).doStop();
+            ((HowlLog) transactionLog).stop();
         }
     }
 

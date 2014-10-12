@@ -40,7 +40,7 @@ public class HowlLogTest {
 
 
     protected void closeTransactionLog(TransactionLog transactionLog) throws Exception {
-        ((HowlLog) transactionLog).doStop();
+        ((HowlLog) transactionLog).stop();
     }
 
 
@@ -63,7 +63,7 @@ public class HowlLogTest {
                 true,
                 xidFactory, new File(basedir, "target")
         );
-        howlLog.doStart();
+        howlLog.start();
         return howlLog;
     }
 
