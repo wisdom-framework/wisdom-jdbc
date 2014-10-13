@@ -3,16 +3,27 @@
               xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
               version="2.1">
 
-    <persistence-unit name="open-jpa-sample" transaction-type="JTA">
-        <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
-        <!--<jta-data-source>osgi:service/javax.sql.DataSource/(datasource.name=data)</jta-data-source>-->
-        <non-jta-data-source>data</non-jta-data-source>
+    <persistence-unit name="jta-unit" transaction-type="JTA">
+        <jta-data-source>data-jta</jta-data-source>
 
-        <class>entities.Student</class>
+        <class>org.wisdom.framework.entities.vehicules.Car</class>
+        <class>org.wisdom.framework.entities.vehicules.Driver</class>
+        <exclude-unlisted-classes/>
 
         <properties>
             <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)"/>
-            <!--<property name="openjpa.TransactionMode" value="local"/>-->
+        </properties>
+    </persistence-unit>
+
+    <persistence-unit name="local-unit" transaction-type="RESOURCE_LOCAL">
+        <non-jta-data-source>data</non-jta-data-source>
+
+        <class>org.wisdom.framework.entities.Student</class>
+        <class>org.wisdom.framework.entities.ClassRoom</class>
+        <exclude-unlisted-classes/>
+
+        <properties>
+            <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)"/>
         </properties>
     </persistence-unit>
 </persistence>

@@ -17,21 +17,31 @@
  * limitations under the License.
  * #L%
  */
-package org.wisdom.framework.entities;
+package org.wisdom.framework.entities.vehicules;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import java.util.List;
 
 @Entity
-public class Student {
+public class Car {
 
-    String name;
+    @OneToMany(mappedBy="car", cascade = CascadeType.ALL)
+    List<Driver> drivers;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    String name;
 
-    @ManyToOne(fetch= FetchType.LAZY)
-    ClassRoom classRoom;
+
+    public List<Driver> getDrivers() {
+        return drivers;
+    }
+
+    public void setDrivers(List<Driver> drivers) {
+        this.drivers = drivers;
+    }
 
     public String getName() {
         return name;
@@ -39,13 +49,5 @@ public class Student {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 }

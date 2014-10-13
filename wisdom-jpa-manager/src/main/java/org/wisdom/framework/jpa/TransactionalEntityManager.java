@@ -88,33 +88,28 @@ class TransactionalEntityManager implements EntityManager {
             em = entityManagerFactory.createEntityManager();
 
 
-            if ("managed".equalsIgnoreCase(unit.getProperties().getProperty("openjpa.TransactionMode"))) {
+            try {
+                // Register a callback at the end of the transaction
+                transaction.registerSynchronization(new Synchronization() {
 
-                try {
-                    // Register a callback at the end of the transaction
-                    transaction.registerSynchronization(new Synchronization() {
-
-                        @Override
-                        public void beforeCompletion() {
-                            if (!open)
-                                throw new IllegalStateException(
-                                        "The Transaction Entity Manager was closed in the mean time");
+                    @Override
+                    public void beforeCompletion() {
+                        if (!open) {
+                            throw new IllegalStateException(
+                                    "The Transaction Entity Manager was closed in the mean time");
                         }
+                    }
 
-                        @Override
-                        public void afterCompletion(int arg0) {
-                            // TODO this is true?
-                            assert transactionThread == Thread.currentThread();
-
-                            EntityManager em = perThreadEntityManager.get();
-                            perThreadEntityManager.set(null);
-                            em.close();
-                        }
-                    });
-                } catch (Exception e) {
-                    em.close();
-                    throw new IllegalStateException("Registering synchronization to close EM", e);
-                }
+                    @Override
+                    public void afterCompletion(int arg0) {
+                        EntityManager em = perThreadEntityManager.get();
+                        perThreadEntityManager.set(null);
+                        em.close();
+                    }
+                });
+            } catch (Exception e) {
+                em.close();
+                throw new IllegalStateException("Registering synchronization to close EM", e);
             }
 
             //

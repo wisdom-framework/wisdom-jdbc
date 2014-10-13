@@ -19,19 +19,38 @@
  */
 package org.wisdom.framework.entities;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import java.util.List;
 
 @Entity
-public class Student {
+public class ClassRoom {
 
-    String name;
+    String building;
+
+    @OneToMany(mappedBy="classRoom", cascade = CascadeType.ALL)
+    List<Student> students;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    String name;
 
-    @ManyToOne(fetch= FetchType.LAZY)
-    ClassRoom classRoom;
+    public String getBuilding() {
+        return building;
+    }
+
+    public void setBuilding(String building) {
+        this.building = building;
+    }
+
+    public List<Student> getStudents() {
+        return students;
+    }
+
+    public void setStudents(List<Student> students) {
+        this.students = students;
+    }
 
     public String getName() {
         return name;
@@ -39,13 +58,5 @@ public class Student {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 }

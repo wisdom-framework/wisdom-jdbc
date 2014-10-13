@@ -24,10 +24,12 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -36,6 +38,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wisdom-framework</groupId>
+            <artifactId>wisdom-test</artifactId>
+            <version>${wisdom.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -55,53 +63,103 @@
             <artifactId>org.osgi.core</artifactId>
         </dependency>
 
+        <!-- Provided by the framework (because of the split package between the JRE and the spec -->
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jta_1.1_spec</artifactId>
             <version>1.1.1</version>
         </dependency>
 
+        <!-- Embedded but also provided to let openjpa being resolved -->
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jpa_2.0_spec</artifactId>
             <version>1.1</version>
         </dependency>
 
+        <!-- Embedded -->
+        <dependency>
+            <groupId>org.objectweb.howl</groupId>
+            <artifactId>howl</artifactId>
+            <version>1.0.1-1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.components</groupId>
+            <artifactId>geronimo-transaction</artifactId>
+            <version>3.1.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Dependency -->
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>wisdom-jdbc-datasources</artifactId>
             <version>0.5-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.objectweb.howl</groupId>
-            <artifactId>howl</artifactId>
-            <version>1.0.1-1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.components</groupId>
-            <artifactId>geronimo-transaction</artifactId>
-            <version>3.1.1</version>
-        </dependency>
 
         <!-- For Testing purpose -->
         <dependency>
             <groupId>org.apache.openjpa</groupId>
-            <artifactId>openjpa-all</artifactId>
+            <artifactId>openjpa</artifactId>
             <version>2.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <!-- Required by openjpa -->
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_2.5_spec</artifactId>
+            <version>1.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>1.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xbean</groupId>
+            <artifactId>xbean-asm4-shaded</artifactId>
+            <version>3.16</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>1.4.179</version>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>h2</artifactId>
             <version>1.3.172_1</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.serp</artifactId>
+            <version>1.14.1_1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ow2.chameleon</groupId>
+            <artifactId>chameleon-core</artifactId>
+
         </dependency>
     </dependencies>
 
@@ -137,9 +195,18 @@
                 <version>${wisdom.version}</version>
                 <extensions>true</extensions>
                 <configuration>
+
                     <excludeTransitive>true</excludeTransitive>
+                    <!-- We need test dependencies -->
                     <deployTestDependencies>true</deployTestDependencies>
                     <disableDistributionPackaging>true</disableDistributionPackaging>
+                    <libraries>
+                        <includes>
+                            <include>:geronimo-jta_1.1_spec</include>
+                        </includes>
+                        <resolveTransitive>true</resolveTransitive>
+                        <excludeFromApplication>true</excludeFromApplication>
+                    </libraries>
                 </configuration>
             </plugin>
             <plugin>
@@ -147,7 +214,7 @@
                 <artifactId>openjpa-maven-plugin</artifactId>
                 <version>2.3.0</version>
                 <configuration>
-                    <includes>**/entities/*.class</includes>
+                    <includes>**/entities/**/*.class</includes>
                     <addDefaultConstructor>true</addDefaultConstructor>
                     <enforcePropertyRestrictions>true</enforcePropertyRestrictions>
                 </configuration>

@@ -17,12 +17,12 @@
  * limitations under the License.
  * #L%
  */
-package org.wisdom.framework.entities;
+package org.wisdom.framework.entities.vehicules;
 
 import javax.persistence.*;
 
 @Entity
-public class Student {
+public class Driver {
 
     String name;
 
@@ -30,8 +30,8 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    @ManyToOne(fetch= FetchType.LAZY)
-    ClassRoom classRoom;
+    @ManyToOne(fetch = FetchType.LAZY)
+    Car car;
 
     public String getName() {
         return name;

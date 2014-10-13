@@ -150,8 +150,8 @@ public class JPAManager {
         String metapersistence = bundle.getHeaders().get(META_PERSISTENCE);
 
         if (metapersistence == null || metapersistence.trim().isEmpty()) {
-            // Check default location
-            if (bundle.getResource("META-INF/persistence.xml") != null) {
+            // Check default location (except for system bundle)
+            if (bundle.getBundleId() != 0 && bundle.getResource("META-INF/persistence.xml") != null) {
                 // Found at the default location
                 metapersistence = "META-INF/persistence.xml";
             } else {

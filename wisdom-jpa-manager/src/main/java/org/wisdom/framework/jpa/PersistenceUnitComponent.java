@@ -24,6 +24,7 @@ import org.apache.felix.ipojo.annotations.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleWiring;
+import org.slf4j.LoggerFactory;
 import org.wisdom.framework.jpa.model.Persistence;
 import org.wisdom.framework.jpa.model.PersistenceUnitCachingType;
 import org.wisdom.framework.jpa.model.PersistenceUnitValidationModeType;
@@ -52,9 +53,15 @@ import java.util.*;
 @Provides
 public class PersistenceUnitComponent implements PersistenceUnitInfo {
 
-    private static final String OSGI_UNIT_PROVIDER = "osgi.unit.provider";
-    private static final String OSGI_UNIT_VERSION = "osgi.unit.version";
-    private static final String OSGI_UNIT_NAME = "osgi.unit.name";
+    //TODO right now we don't check that we have data sources, which may be an issue,
+    // We should enforce their availability and track them
+
+
+    private static final String UNIT_PROVIDER_PROP = "persistent.unit.provider";
+    private static final String UNIT_VERSION_PROP = "persistent.unit.version";
+    private static final String UNIT_NAME_PROP = "persistent.unit.name";
+    private static final String UNIT_ENTITIES_PROP = "persistent.unit.entities";
+    private static final String UNIT_TRANSACTION_PROP = "persistent.unit.transaction.mode";
 
     private final Persistence.PersistenceUnit persistenceUnitXml;
 
@@ -122,6 +129,7 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
      */
     @Invalidate
     void shutdown() {
+        //TODO Close em and emf
         if (emRegistration != null) {
             emRegistration.unregister();
         }
@@ -135,42 +143,49 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
 
     @Validate
     public void start() {
-        Map<String, Object> map = new HashMap<>();
-        for (Persistence.PersistenceUnit.Properties.Property p :
-                persistenceUnitXml.getProperties().getProperty()) {
-            map.put(p.getName(), p.getValue());
-        }
-
-        if (isOpenJPA()) {
-            map.put("openjpa.ManagedRuntime",
-                    "invocation(TransactionManagerMethod=org.wisdom.framework.jpa.accessor" +
-                            ".TransactionManagerAccessor.get)");
-        }
-
-
-        Hashtable<String, Object> properties = new Hashtable<>();
-        properties.put(OSGI_UNIT_NAME, persistenceUnitXml.getName());
-        properties.put(OSGI_UNIT_VERSION, sourceBundle.bundle.getVersion());
-        properties.put(OSGI_UNIT_PROVIDER, provider.getClass().getName());
-        properties.put("jpa.transaction.type", getTransactionType().toString());
-
-        // If the unit set the transaction to RESOURCE_LOCAL, no JTA involved.
-        if (persistenceUnitXml.getTransactionType() ==
-                org.wisdom.framework.jpa.model.PersistenceUnitTransactionType.RESOURCE_LOCAL) {
-            if (isOpenJPA()) {
-                map.put("openjpa.TransactionMode", "false");
+        try {
+            Map<String, Object> map = new HashMap<>();
+            for (Persistence.PersistenceUnit.Properties.Property p :
+                    persistenceUnitXml.getProperties().getProperty()) {
+                map.put(p.getName(), p.getValue());
             }
-            EntityManagerFactory emf = provider.createContainerEntityManagerFactory(this, map);
-            emfRegistration = bundleContext.registerService(EntityManagerFactory.class, emf, properties);
 
-            emRegistration = bundleContext.registerService(EntityManager.class,
-                    emf.createEntityManager(), properties);
-        } else {
-            // JTA
-            EntityManagerFactory emf = provider.createContainerEntityManagerFactory(this, map);
-            emRegistration = bundleContext.registerService(EntityManager.class,
-                    new TransactionalEntityManager(transactionManager, emf, this), properties);
-            emfRegistration = bundleContext.registerService(EntityManagerFactory.class, emf, properties);
+            if (isOpenJPA()) {
+                map.put("openjpa.ManagedRuntime",
+                        "invocation(TransactionManagerMethod=org.wisdom.framework.jpa.accessor" +
+                                ".TransactionManagerAccessor.get)");
+            }
+
+
+            Hashtable<String, Object> properties = new Hashtable<>();
+            properties.put(UNIT_NAME_PROP, persistenceUnitXml.getName());
+            properties.put(UNIT_VERSION_PROP, sourceBundle.bundle.getVersion());
+            properties.put(UNIT_PROVIDER_PROP, provider.getClass().getName());
+            List<String> entities = persistenceUnitXml.getClazz();
+            properties.put(UNIT_ENTITIES_PROP, entities.toArray(new String[entities.size()]));
+            properties.put(UNIT_TRANSACTION_PROP, getTransactionType().toString());
+
+            // If the unit set the transaction to RESOURCE_LOCAL, no JTA involved.
+            if (persistenceUnitXml.getTransactionType() ==
+                    org.wisdom.framework.jpa.model.PersistenceUnitTransactionType.RESOURCE_LOCAL) {
+                if (isOpenJPA()) {
+                    map.put("openjpa.TransactionMode", "false");
+                }
+                EntityManagerFactory emf = provider.createContainerEntityManagerFactory(this, map);
+                emfRegistration = bundleContext.registerService(EntityManagerFactory.class, emf, properties);
+
+                emRegistration = bundleContext.registerService(EntityManager.class,
+                        emf.createEntityManager(), properties);
+            } else {
+                // JTA
+                EntityManagerFactory emf = provider.createContainerEntityManagerFactory(this, map);
+                emRegistration = bundleContext.registerService(EntityManager.class,
+                        new TransactionalEntityManager(transactionManager, emf, this), properties);
+                emfRegistration = bundleContext.registerService(EntityManagerFactory.class, emf, properties);
+            }
+        } catch (Throwable e) {
+            LoggerFactory.getLogger(this.getClass()).error("Error while initializing the JPA services for unit {}",
+                    persistenceUnitXml.getName(), e);
         }
     }
 
@@ -228,7 +243,7 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
      * @see javax.persistence.spi.PersistenceUnitInfo#getJtaDataSource()
      */
     @Override
-    public synchronized DataSource getJtaDataSource() {
+    public DataSource getJtaDataSource() {
         return jtaDataSource;
     }
 
