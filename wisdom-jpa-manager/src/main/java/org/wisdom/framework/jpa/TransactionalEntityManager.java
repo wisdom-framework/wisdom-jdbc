@@ -82,9 +82,6 @@ class TransactionalEntityManager implements EntityManager {
                 throw new TransactionRequiredException("Cannot create an EM since no transaction active");
             }
 
-            // Ok, now we can create one since we can also close it.
-            final Thread transactionThread = Thread.currentThread();
-
             em = entityManagerFactory.createEntityManager();
 
 

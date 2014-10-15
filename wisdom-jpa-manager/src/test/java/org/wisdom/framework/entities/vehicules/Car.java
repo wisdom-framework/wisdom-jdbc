@@ -19,10 +19,7 @@
  */
 package org.wisdom.framework.entities.vehicules;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -31,9 +28,12 @@ public class Car {
     @OneToMany(mappedBy="car", cascade = CascadeType.ALL)
     List<Driver> drivers;
 
-    @Id
+
     String name;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long id;
 
     public List<Driver> getDrivers() {
         return drivers;
@@ -49,5 +49,13 @@ public class Car {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

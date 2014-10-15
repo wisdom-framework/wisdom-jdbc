@@ -20,10 +20,15 @@
 package org.wisdom.framework.it;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.chameleon.testing.helpers.OSGiHelper;
+import org.wisdom.api.annotations.Interception;
+import org.wisdom.api.model.Crud;
+import org.wisdom.api.model.EntityFilter;
+import org.wisdom.api.model.HasBeenRollBackException;
 import org.wisdom.framework.entities.ClassRoom;
 import org.wisdom.framework.entities.Student;
 import org.wisdom.framework.entities.vehicules.Car;
@@ -40,6 +45,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.transaction.*;
+import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,6 +69,14 @@ public class JPAManagerIT extends WisdomTest {
     @Filter("(persistent.unit.name=jta-unit)")
     EntityManager jtaEm;
 
+    @Inject
+    @Filter("(entity.classname=org.wisdom.framework.entities.Student)")
+    Crud<Student, Integer> students;
+
+    @Inject
+    @Filter("(entity.classname=org.wisdom.framework.entities.vehicules.Car)")
+    Crud<Car, Long> cars;
+
     private OSGiHelper helper;
 
     @Before
@@ -81,6 +95,8 @@ public class JPAManagerIT extends WisdomTest {
         assertThat(localEmf).isNotNull();
         assertThat(jtaEm).isNotNull();
         assertThat(localEm).isNotNull();
+        assertThat(students).isNotNull();
+        assertThat(cars).isNotNull();
 
         // For classloading purpose retrieve the transaction manager as follows:
         assertThat(TransactionManagerService.get()).isNotNull();
@@ -238,6 +254,132 @@ public class JPAManagerIT extends WisdomTest {
         assertThat(rooms).hasSize(0);
         assertThat(students).hasSize(0);
         em.close();
+    }
+
+    @Test
+    public void testStudentCrudService() {
+        Student student1 = new Student();
+        student1.setName("A");
+        students.save(student1);
+
+        Student student2 = new Student();
+        student2.setName("B");
+        Student student3 = new Student();
+        student3.setName("C");
+        students.save(ImmutableList.of(student2, student3));
+
+        assertThat(students.count()).isEqualTo(3);
+        assertThat(students.findAll()).hasSize(3);
+        assertThat(students.findAll(new EntityFilter<Student>() {
+            @Override
+            public boolean accept(Student student) {
+                return !student.getName().equalsIgnoreCase("A");
+            }
+        })).hasSize(2);
+        assertThat(students.findOne(new EntityFilter<Student>() {
+            @Override
+            public boolean accept(Student student) {
+                return student.getName().equalsIgnoreCase("A");
+            }
+        })).isNotNull();
+        
+        assertThat(students.findOne(student1.getId())).isNotNull();
+        assertThat(students.findOne(-1)).isNull();
+
+        assertThat(students.exists(student1.getId())).isTrue();
+        assertThat(students.exists(-1)).isFalse();
+
+        assertThat(students.getEntityClass()).isEqualTo(Student.class);
+        assertThat(students.getIdClass()).isEqualTo(Integer.TYPE);
+        assertThat(students.getRepository()).isNotNull();
+        assertThat(students.getRepository().get()).isEqualTo(localEm);
+
+
+        // Check update
+        assertThat(students.findOne(new EntityFilter<Student>() {
+            @Override
+            public boolean accept(Student student) {
+                return student.getName().equalsIgnoreCase("D");
+            }
+        })).isNull();
+        student1.setName("D");
+        students.save(student1);
+        assertThat(students.findOne(new EntityFilter<Student>() {
+            @Override
+            public boolean accept(Student student) {
+                return student.getName().equalsIgnoreCase("D");
+            }
+        })).isNotNull();
+        assertThat(students.findOne(new EntityFilter<Student>() {
+            @Override
+            public boolean accept(Student student) {
+                return student.getName().equalsIgnoreCase("A");
+            }
+        })).isNull();
+
+        students.delete(student2);
+        assertThat(students.count()).isEqualTo(2);
+        students.delete(student3.getId());
+        assertThat(students.count()).isEqualTo(1);
+        students.delete(ImmutableList.of(student3, student1));
+        assertThat(students.count()).isEqualTo(0);
+    }
+
+    @Test
+    public void testCarCrudService() throws HasBeenRollBackException {
+        Car car1 = new Car();
+        car1.setName("A");
+        cars.save(car1);
+
+        Car car2 = new Car();
+        car2.setName("B");
+        Car car3 = new Car();
+        car3.setName("C");
+        cars.save(ImmutableList.of(car2, car3));
+
+        assertThat(cars.count()).isEqualTo(3);
+        assertThat(cars.findAll()).hasSize(3);
+        assertThat(cars.findAll(new EntityFilter<Car>() {
+            @Override
+            public boolean accept(Car car) {
+                return !car.getName().equalsIgnoreCase("A");
+            }
+        })).hasSize(2);
+        assertThat(cars.findOne(new EntityFilter<Car>() {
+            @Override
+            public boolean accept(Car student) {
+                return student.getName().equalsIgnoreCase("A");
+            }
+        })).isNotNull();
+
+        assertThat(cars.findOne(car1.getId())).isNotNull();
+        assertThat(cars.findOne(-1l)).isNull();
+
+        assertThat(cars.exists(car1.id)).isTrue();
+        assertThat(cars.exists(-1l)).isFalse();
+
+        assertThat(cars.getEntityClass()).isEqualTo(Car.class);
+        assertThat(cars.getIdClass()).isEqualTo(Long.class);
+        assertThat(cars.getRepository()).isNotNull();
+        assertThat(cars.getRepository().get()).isEqualTo(jtaEm);
+
+        cars.delete(car2.id);
+        cars.executeTransactionalBlock(new Runnable() {
+            @Override
+            public void run() {
+                Iterable<Car> list = cars.findAll();
+                assertThat(Iterables.size(list)).isEqualTo(2);
+
+                for (Car c : list) {
+                    cars.delete(c);
+                }
+
+                assertThat(cars.count()).isEqualTo(0);
+            }
+        });
+
+        assertThat(cars.count()).isEqualTo(0);
+
     }
 
     private void create(EntityManager em) {

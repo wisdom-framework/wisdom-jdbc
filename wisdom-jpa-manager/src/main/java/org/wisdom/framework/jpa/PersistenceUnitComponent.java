@@ -25,6 +25,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleWiring;
 import org.slf4j.LoggerFactory;
+import org.wisdom.framework.jpa.crud.JPARepository;
 import org.wisdom.framework.jpa.model.Persistence;
 import org.wisdom.framework.jpa.model.PersistenceUnitCachingType;
 import org.wisdom.framework.jpa.model.PersistenceUnitValidationModeType;
@@ -39,6 +40,7 @@ import javax.persistence.spi.PersistenceUnitInfo;
 import javax.persistence.spi.PersistenceUnitTransactionType;
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
+import javax.validation.ValidatorFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -71,6 +73,13 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
     private final PersistentBundle sourceBundle;
     private final String location;
     private final BundleContext bundleContext;
+
+    private EntityManager entityManager;
+    private EntityManagerFactory entityManagerFactory;
+    private JPARepository repository;
+
+    @Requires
+    private ValidatorFactory validator;
 
 
     /**
@@ -114,9 +123,9 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
      * @param bundle the source bundle
      * @param xml    The xml of the persistence unit
      */
-    PersistenceUnitComponent(@Property(name = "bundle") PersistentBundle bundle,
-                             @Property(name = "unit") Persistence.PersistenceUnit xml,
-                             @Context BundleContext context) throws Exception {
+    public PersistenceUnitComponent(@Property(name = "bundle") PersistentBundle bundle,
+                                    @Property(name = "unit") Persistence.PersistenceUnit xml,
+                                    @Context BundleContext context) throws Exception {
         this.sourceBundle = bundle;
         this.persistenceUnitXml = xml;
         this.bundleContext = context;
@@ -129,12 +138,21 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
      */
     @Invalidate
     void shutdown() {
-        //TODO Close em and emf
+        if (repository != null) {
+            repository.dispose();
+        }
+
         if (emRegistration != null) {
             emRegistration.unregister();
         }
+        if (entityManager != null) {
+            entityManager.close();
+        }
         if (emfRegistration != null) {
             emfRegistration.unregister();
+        }
+        if (entityManagerFactory != null) {
+            entityManagerFactory.close();
         }
         if (transformer != null) {
             transformer.unregister(sourceBundle.bundle);
@@ -156,6 +174,7 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
                                 ".TransactionManagerAccessor.get)");
             }
 
+            map.put("javax.persistence.validation.factory", validator);
 
             Hashtable<String, Object> properties = new Hashtable<>();
             properties.put(UNIT_NAME_PROP, persistenceUnitXml.getName());
@@ -171,22 +190,32 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
                 if (isOpenJPA()) {
                     map.put("openjpa.TransactionMode", "false");
                 }
-                EntityManagerFactory emf = provider.createContainerEntityManagerFactory(this, map);
-                emfRegistration = bundleContext.registerService(EntityManagerFactory.class, emf, properties);
+                entityManagerFactory = provider.createContainerEntityManagerFactory(this, map);
+                emfRegistration = bundleContext.registerService(EntityManagerFactory.class, entityManagerFactory, properties);
 
+                entityManager = entityManagerFactory.createEntityManager();
                 emRegistration = bundleContext.registerService(EntityManager.class,
-                        emf.createEntityManager(), properties);
+                        entityManager, properties);
+
+                repository = new JPARepository(persistenceUnitXml, entityManager,
+                        entityManagerFactory, transactionManager, sourceBundle.bundle.getBundleContext());
             } else {
                 // JTA
-                EntityManagerFactory emf = provider.createContainerEntityManagerFactory(this, map);
+                entityManagerFactory = provider.createContainerEntityManagerFactory(this, map);
+                entityManager = new TransactionalEntityManager(transactionManager, entityManagerFactory, this);
                 emRegistration = bundleContext.registerService(EntityManager.class,
-                        new TransactionalEntityManager(transactionManager, emf, this), properties);
-                emfRegistration = bundleContext.registerService(EntityManagerFactory.class, emf, properties);
+                        entityManager, properties);
+                emfRegistration = bundleContext.registerService(EntityManagerFactory.class, entityManagerFactory, properties);
+                repository = new JPARepository(persistenceUnitXml, entityManager,
+                        entityManagerFactory, transactionManager, sourceBundle.bundle.getBundleContext());
+                System.out.println("Repo : " + repository);
             }
         } catch (Throwable e) {
+            e.printStackTrace();
             LoggerFactory.getLogger(this.getClass()).error("Error while initializing the JPA services for unit {}",
                     persistenceUnitXml.getName(), e);
         }
+
     }
 
     private boolean isOpenJPA() {
@@ -436,5 +465,9 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
         }
 
         return ValidationMode.valueOf(validationMode.name());
+    }
+
+    protected JPARepository getRepository() {
+        return repository;
     }
 }

@@ -35,7 +35,7 @@ import java.util.Set;
 /**
  * This class represents a bundle with one or more valid Persistence Units. It computes the instance configuration to use to create the instance that will handle the persistence units.
  */
-class PersistentBundle {
+public class PersistentBundle {
 
     /**
      * The set of created instance.
@@ -60,8 +60,8 @@ class PersistentBundle {
      * @param set     a set of persistence units.
      * @param factory the PersistenceUnit factory
      */
-    PersistentBundle(Bundle bundle, Set<Persistence.PersistenceUnit> set,
-                     Factory factory) throws Exception {
+    public PersistentBundle(Bundle bundle, Set<Persistence.PersistenceUnit> set,
+                            Factory factory) throws Exception {
         LOGGER.info("Creating persistence bundle for {}", bundle.getBundleId());
         this.factory = factory;
         this.bundle = bundle;

@@ -19,35 +19,61 @@
  */
 package org.wisdom.framework.jpa;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.apache.felix.ipojo.ComponentInstance;
 import org.apache.felix.ipojo.Factory;
 import org.apache.openjpa.persistence.PersistenceProviderImpl;
 import org.h2.jdbcx.JdbcDataSource;
+import org.junit.After;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.Version;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.jdbc.DataSourceFactory;
+import org.wisdom.api.configuration.ApplicationConfiguration;
+import org.wisdom.api.model.Crud;
+import org.wisdom.api.model.EntityFilter;
 import org.wisdom.framework.entities.Student;
+import org.wisdom.framework.entities.vehicules.Car;
+import org.wisdom.framework.jpa.crud.JPARepository;
 import org.wisdom.framework.jpa.model.Persistence;
 import org.wisdom.framework.jpa.model.PersistenceUnitTransactionType;
+import org.wisdom.framework.transaction.impl.TransactionManagerService;
 import org.wisdom.jdbc.driver.h2.H2Service;
 
+import javax.persistence.EntityManager;
 import javax.sql.DataSource;
+import javax.xml.bind.JAXB;
+import java.io.File;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.util.Collection;
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
 public class PersistenceUnitComponentTest {
 
+
+    private TransactionManagerService tms;
+
+    @After
+    public void tearDown() throws Exception {
+        if (tms != null) {
+            tms.unregister();
+        }
+    }
 
     @Test
     public void testCreationUsingJTATransactionMode() throws Exception {
@@ -60,6 +86,7 @@ public class PersistenceUnitComponentTest {
         when(bundle.adapt(BundleWiring.class)).thenReturn(wiring);
         BundleContext context = mock(BundleContext.class);
         when(context.getBundle()).thenReturn(bundle);
+        when(bundle.getBundleContext()).thenReturn(context);
         when(context.registerService(any(Class.class), any(), any(Dictionary.class))).thenReturn(mock(ServiceRegistration.class));
         Persistence.PersistenceUnit pu = new Persistence.PersistenceUnit();
         pu.setName("unit-test");
@@ -76,8 +103,11 @@ public class PersistenceUnitComponentTest {
         pu.setProperties(properties);
         PersistentBundle pb = new PersistentBundle(bundle, ImmutableSet.of(pu), factory);
         PersistenceUnitComponent component = new PersistenceUnitComponent(pb, pu, context);
-        component.jtaDataSource = new JdbcDataSource();
-        component.nonJtaDataSource = new JdbcDataSource();
+        H2Service h2 = new H2Service();
+        DataSource ds = h2.createDataSource(getDataSourceProperties());
+
+        component.jtaDataSource = ds;
+        component.nonJtaDataSource = ds;
         component.provider = new PersistenceProviderImpl();
         component.transformer = mock(JPATransformer.class);
 
@@ -101,6 +131,7 @@ public class PersistenceUnitComponentTest {
         when(bundle.adapt(BundleWiring.class)).thenReturn(wiring);
         BundleContext context = mock(BundleContext.class);
         when(context.getBundle()).thenReturn(bundle);
+        when(bundle.getBundleContext()).thenReturn(context);
         when(context.registerService(any(Class.class), any(), any(Dictionary.class))).thenReturn(mock(ServiceRegistration.class));
         Persistence.PersistenceUnit pu = new Persistence.PersistenceUnit();
         pu.setName("unit-test");
@@ -138,9 +169,19 @@ public class PersistenceUnitComponentTest {
     private Properties getDataSourceProperties() {
         Properties props = new Properties();
         props.put(DataSourceFactory.JDBC_URL, "jdbc:h2:mem:test");
-        props.put(DataSourceFactory.JDBC_USER, "user");
-        props.put(DataSourceFactory.JDBC_PASSWORD, "password");
+//        props.put(DataSourceFactory.JDBC_USER, "user");
+//        props.put(DataSourceFactory.JDBC_PASSWORD, "password");
         return props;
     }
+
+    private Persistence.PersistenceUnit get(String name, Collection<Persistence.PersistenceUnit> list) {
+        for (Persistence.PersistenceUnit unit : list) {
+            if (name.equalsIgnoreCase(unit.getName())) {
+                return unit;
+            }
+        }
+        return null;
+    }
+
 
 }

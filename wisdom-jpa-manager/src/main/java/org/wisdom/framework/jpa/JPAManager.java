@@ -39,7 +39,8 @@ import java.util.regex.Pattern;
 
 /**
  * The entry point of the JPA bridge.
- * This component tracks bundles and check if they contain a {@code Meta-Persistence} header. If so, is creates a necessary persistence unit. By default, the tracker check for {@code META-INF/persistence.xml}
+ * This component tracks bundles and check if they contain a {@code Meta-Persistence} header. If so, is creates a
+ * necessary persistence unit. By default, the tracker check for {@code META-INF/persistence.xml}
  */
 @Component(immediate = true)
 @Instantiate
@@ -53,7 +54,7 @@ public class JPAManager {
     /**
      * The logger.
      */
-    final static Logger LOGGER = LoggerFactory.getLogger(JPAManager.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(JPAManager.class);
 
     /**
      * The bundle context, used to register the tracker.
@@ -101,6 +102,7 @@ public class JPAManager {
                                     "an unexpected exception {}. This bundle (also the other persistence " +
                                     "units in this bundle) will be ignored.",
                             bundle, e.getMessage(), e);
+                    //noinspection Contract
                     return null;
                 }
             }
@@ -165,10 +167,9 @@ public class JPAManager {
         Set<Persistence.PersistenceUnit> set = new HashSet<>();
         for (String location : Splitter.on(",").omitEmptyStrings().trimResults().splitToList(metapersistence)) {
             LOGGER.info("Analysing location {}", location);
+            // Lets remember where we came from
             Persistence.PersistenceUnit.Properties.Property p =
                     new Persistence.PersistenceUnit.Properties.Property();
-
-            // Lets remember where we came from
             p.setName("location");
             p.setValue(location);
 

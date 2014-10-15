@@ -20,10 +20,12 @@
 package org.wisdom.framework.entities;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class Student {
 
+    @NotNull
     String name;
 
     @Id
