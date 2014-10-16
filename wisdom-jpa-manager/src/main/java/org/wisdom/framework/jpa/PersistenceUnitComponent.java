@@ -198,9 +198,6 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
             // If the unit set the transaction to RESOURCE_LOCAL, no JTA involved.
             if (persistenceUnitXml.getTransactionType() ==
                     org.wisdom.framework.jpa.model.PersistenceUnitTransactionType.RESOURCE_LOCAL) {
-                if (isOpenJPA()) {
-                    map.put("openjpa.TransactionMode", "false");
-                }
                 entityManagerFactory = provider.createContainerEntityManagerFactory(this, map);
                 emfRegistration = bundleContext.registerService(EntityManagerFactory.class, entityManagerFactory, properties);
 
