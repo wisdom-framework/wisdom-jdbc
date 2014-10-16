@@ -85,20 +85,23 @@ public class QuotedTokenizer {
             char c = string.charAt(index++);
 
             if (Character.isWhitespace(c)) {
-                if (index == string.length())
+                if (index == string.length()) {
                     break;
+                }
 
-                if (validspace)
+                if (validspace) {
                     sb.append(c);
+                }
 
                 continue;
             }
 
             if (separators.indexOf(c) >= 0) {
-                if (returnTokens)
+                if (returnTokens) {
                     peek = Character.toString(c);
-                else
+                } else {
                     separator = c;
+                }
                 break;
             }
 
@@ -117,11 +120,13 @@ public class QuotedTokenizer {
             }
         }
         String result = sb.toString();
-        if (!hadstring)
+        if (!hadstring) {
             result = result.trim();
+        }
 
-        if (result.length() == 0 && index == string.length())
+        if (result.length() == 0 && index == string.length()) {
             return null;
+        }
         return result;
     }
 
@@ -137,8 +142,9 @@ public class QuotedTokenizer {
         char quote = c;
         while (index < string.length()) {
             c = string.charAt(index++);
-            if (c == quote)
+            if (c == quote) {
                 break;
+            }
             if (c == '\\' && index < string.length()) {
                 char cc = string.charAt(index++);
                 if (cc != quote)

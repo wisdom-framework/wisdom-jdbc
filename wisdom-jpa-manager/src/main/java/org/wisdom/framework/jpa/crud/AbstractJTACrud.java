@@ -33,6 +33,9 @@ import java.util.concurrent.Callable;
 /**
  * Abstract implementation of the Crud service for JPA.
  * Most methods are very naive implementation and should probably be optimized.
+ *
+ * @param <T> the type of the entity
+ * @param <I> the type of the entity primary key
  */
 public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud<T, I> {
 
@@ -163,7 +166,8 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
              */
             @Override
             public Void call() throws Exception {
-                runnable.run();
+                // We call the runnable directly.
+                runnable.run(); //NOSONAR
                 return null;
             }
         });

@@ -114,8 +114,11 @@ public class JTAEntityCrud<T, I extends Serializable> extends AbstractJTACrud<T,
             X result;
             try {
                 result = task.call();
-            } catch (Throwable e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                // Exception thrown by the block
+                LOGGER.error("[Unit : {}, Entity: {}, " +
+                                "Id: {}] - the transactional block has thrown an exception, rollback the transaction",
+                        pu, entity.getName(), idClass.getName(), e);
                 if (transactionBegunLocally) {
                     transaction.rollback();
                 } else {
@@ -128,7 +131,7 @@ public class JTAEntityCrud<T, I extends Serializable> extends AbstractJTACrud<T,
             }
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            // The transaction management has thrown an exception
             LOGGER.error("[Unit : {}, Entity: {}, " +
                     "Id: {}] - Cannot execute JPA query", pu, entity.getName(), idClass.getName(), e);
         }

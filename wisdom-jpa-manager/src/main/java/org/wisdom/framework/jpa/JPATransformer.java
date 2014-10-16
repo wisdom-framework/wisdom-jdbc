@@ -148,29 +148,27 @@ public class JPATransformer implements WeavingHook {
         }
 
         if (bundle != null) {
-            //
-            // Get the import clauses
-            //
+            // Get the export clauses of the JPA provider.
             Clauses clauses = Clauses.parse(bundle.getHeaders().get(Constants.EXPORT_PACKAGE));
             if (!clauses.isEmpty()) {
                 List<String> list = new ArrayList<>();
                 for (Map.Entry<String, Map<String, String>> e : clauses.entrySet()) {
 
-                    //
                     // Create a new clause
-                    //
                     StringBuilder sb = new StringBuilder();
                     sb.append(e.getKey());
                     for (Map.Entry<String, String> ee : e.getValue().entrySet()) {
-                        if (ee.getKey().endsWith(":"))
+                        if (ee.getKey().endsWith(":")) {
                             continue;
+                        }
 
                         sb.append(";").append(ee.getKey()).append("=");
                         String v = ee.getValue();
-                        if (WORD.matcher(v).matches())
+                        if (WORD.matcher(v).matches()) {
                             sb.append(ee.getValue());
-                        else
+                        }  else {
                             sb.append("\"").append(ee.getValue()).append("\"");
+                        }
                     }
                     list.add(sb.toString());
                 }

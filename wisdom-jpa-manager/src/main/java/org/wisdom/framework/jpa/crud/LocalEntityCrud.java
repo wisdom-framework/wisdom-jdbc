@@ -78,10 +78,11 @@ public class LocalEntityCrud<T, I extends Serializable> extends AbstractJTACrud<
             X result;
             try {
                 result = task.call();
-            } catch (Throwable e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                // The task we execute has thrown an exception.
                 LOGGER.error("[Unit : {}, Entity: {}, " +
-                                "Id: {}] - Cannot execute query, rollback the transaction", pu, entity.getName(),
+                                "Id: {}] - the transactional block has thrown an exception, rollback the transaction",
+                        pu, entity.getName(),
                         idClass.getName(), e);
                 if (transactionBegunHere) {
                     entityManager.getTransaction().rollback();
@@ -96,7 +97,7 @@ public class LocalEntityCrud<T, I extends Serializable> extends AbstractJTACrud<
             }
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            // The commit has thrown an exception
             LOGGER.error("[Unit : {}, Entity: {}, " +
                     "Id: {}] - Cannot execute query", pu, entity.getName(), idClass.getName(), e);
         }

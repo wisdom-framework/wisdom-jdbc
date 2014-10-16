@@ -24,6 +24,7 @@ import org.apache.felix.ipojo.annotations.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleWiring;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wisdom.framework.jpa.crud.JPARepository;
 import org.wisdom.framework.jpa.model.Persistence;
@@ -43,6 +44,7 @@ import javax.transaction.TransactionManager;
 import javax.validation.ValidatorFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -54,6 +56,8 @@ import java.util.*;
 @Component
 @Provides
 public class PersistenceUnitComponent implements PersistenceUnitInfo {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(PersistenceUnitComponent.class);
 
     //TODO right now we don't check that we have data sources, which may be an issue,
     // We should enforce their availability and track them
@@ -120,8 +124,9 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
     /**
      * Create a new Persistence Unit Info
      *
-     * @param bundle the source bundle
-     * @param xml    The xml of the persistence unit
+     * @param bundle  the source bundle
+     * @param xml     The xml of the persistence unit
+     * @param context the bundle context
      */
     public PersistenceUnitComponent(@Property(name = "bundle") PersistentBundle bundle,
                                     @Property(name = "unit") Persistence.PersistenceUnit xml,
@@ -159,6 +164,10 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
         }
     }
 
+    /**
+     * Starts the unit. It creates the entity manager factory and entity manager, as well as the repository and crud
+     * services.
+     */
     @Validate
     public void start() {
         try {
@@ -174,9 +183,11 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
                                 ".TransactionManagerAccessor.get)");
             }
 
+            // This is not going to work with OpenJPA because the current version of OpenJPA requires an old version
+            // of javax.validation. The wisdom one is too recent.
             map.put("javax.persistence.validation.factory", validator);
 
-            Hashtable<String, Object> properties = new Hashtable<>();
+            Dictionary<String, Object> properties = new Hashtable<>();
             properties.put(UNIT_NAME_PROP, persistenceUnitXml.getName());
             properties.put(UNIT_VERSION_PROP, sourceBundle.bundle.getVersion());
             properties.put(UNIT_PROVIDER_PROP, provider.getClass().getName());
@@ -208,11 +219,9 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
                 emfRegistration = bundleContext.registerService(EntityManagerFactory.class, entityManagerFactory, properties);
                 repository = new JPARepository(persistenceUnitXml, entityManager,
                         entityManagerFactory, transactionManager, sourceBundle.bundle.getBundleContext());
-                System.out.println("Repo : " + repository);
             }
-        } catch (Throwable e) {
-            e.printStackTrace();
-            LoggerFactory.getLogger(this.getClass()).error("Error while initializing the JPA services for unit {}",
+        } catch (Exception e) {
+            LOGGER.error("Error while initializing the JPA services for unit {}",
                     persistenceUnitXml.getName(), e);
         }
 
@@ -254,15 +263,15 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
      */
     @Override
     public List<URL> getJarFileUrls() {
-        try {
-            List<URL> urls = new ArrayList<>();
-            for (String url : persistenceUnitXml.getJarFile()) {
+        List<URL> urls = new ArrayList<>();
+        for (String url : persistenceUnitXml.getJarFile()) {
+            try {
                 urls.add(new URL(url));
+            } catch (MalformedURLException e) {
+                LOGGER.error("Cannot create an URL object from {}", url, e);
             }
-            return urls;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
+        return urls;
     }
 
     /**
@@ -306,21 +315,22 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
     @Override
     public ClassLoader getNewTempClassLoader() {
 
-        return new ClassLoader(getClassLoader()) {
+        return new ClassLoader(getClassLoader()) {  //NOSONAR
             /**
-             * Searchs for the .class file and define it using the current class loader.
+             * Searches for the .class file and define it using the current class loader.
              * @param className the class name
              * @return the class object
              * @throws ClassNotFoundException if the class cannot be found
              */
             @Override
-            protected Class<?> findClass(String className) throws ClassNotFoundException {
+            protected Class findClass(String className) throws ClassNotFoundException {
 
                 // Use path of class, then get the resource
                 String path = className.replace('.', '/').concat(".class");
                 URL resource = getParent().getResource(path);
-                if (resource == null)
+                if (resource == null) {
                     throw new ClassNotFoundException(className + " as resource " + path + " in " + getParent());
+                }
 
                 try {
                     ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -390,18 +400,15 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
      */
     @Override
     public URL getPersistenceUnitRootUrl() {
-        //
-        // Make one that is OSGi based
-        //
-
+        // Make one that is OSGi based, it relies on the 'location' property
         String loc = location;
         int n = loc.lastIndexOf('/');
         if (n > 0) {
             loc = loc.substring(0, n);
         }
-        if (loc.isEmpty())
+        if (loc.isEmpty()) {
             loc = "/";
-
+        }
         return sourceBundle.bundle.getResource(loc);
     }
 
@@ -421,10 +428,11 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
     @Override
     public Properties getProperties() {
         Properties properties = new Properties();
-        if (persistenceUnitXml.getProperties() != null && persistenceUnitXml.getProperties().getProperty() != null)
+        if (persistenceUnitXml.getProperties() != null && persistenceUnitXml.getProperties().getProperty() != null) {
             for (Persistence.PersistenceUnit.Properties.Property p : persistenceUnitXml.getProperties().getProperty()) {
                 properties.put(p.getName(), p.getValue());
             }
+        }
         return properties;
     }
 
@@ -434,8 +442,9 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
     @Override
     public SharedCacheMode getSharedCacheMode() {
         PersistenceUnitCachingType sharedCacheMode = persistenceUnitXml.getSharedCacheMode();
-        if (sharedCacheMode == null)
+        if (sharedCacheMode == null) {
             return null;
+        }
 
         return SharedCacheMode.valueOf(sharedCacheMode.name());
     }
@@ -467,7 +476,4 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
         return ValidationMode.valueOf(validationMode.name());
     }
 
-    protected JPARepository getRepository() {
-        return repository;
-    }
 }
