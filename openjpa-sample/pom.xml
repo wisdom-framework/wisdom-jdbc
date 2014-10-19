@@ -133,6 +133,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <skipGoogleClosure>true</skipGoogleClosure>
+                    <disableDistributionPackaging>true</disableDistributionPackaging>
                     <libraries>
                         <includes>
                             <include>:geronimo-jta_1.1_spec</include>
@@ -205,6 +206,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <!-- should not be deployed -->
+                    <skip>true</skip>
+                </configuration>
             </plugin>
         </plugins>
     </build>
