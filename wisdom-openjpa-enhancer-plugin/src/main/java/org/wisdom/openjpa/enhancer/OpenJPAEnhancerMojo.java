@@ -30,6 +30,7 @@ import org.apache.openjpa.enhance.PCEnhancer;
 import org.apache.openjpa.lib.util.Options;
 import org.wisdom.maven.WatchingException;
 import org.wisdom.maven.mojos.AbstractWisdomWatcherMojo;
+import org.wisdom.maven.osgi.BundlePackager;
 import org.wisdom.maven.utils.WatcherUtils;
 
 import java.io.File;
@@ -88,8 +89,6 @@ public class OpenJPAEnhancerMojo extends AbstractWisdomWatcherMojo {
     /**
      * Used if a non-default file location for the persistence.xml should be used
      * If not specified, the default one in META-INF/persistence.xml will be used.
-     * Since openjpa-2.3.0 this can also be a resource location. In prior releases
-     * it was only possible to specify a file location.
      */
     @Parameter(defaultValue = "target/classes/META-INF/persistence.xml")
     private String persistenceXmlFile;
@@ -191,6 +190,8 @@ public class OpenJPAEnhancerMojo extends AbstractWisdomWatcherMojo {
      */
     private static final String OPTION_USE_TEMP_CLASSLOADER = "tcl";
 
+    private static final String META_PERSISTENCE_HEADER = "Meta-Persistence";
+
     /**
      * Perform whatever build-process behavior this <code>Mojo</code> implements.
      * <br/>
@@ -198,9 +199,9 @@ public class OpenJPAEnhancerMojo extends AbstractWisdomWatcherMojo {
      * the <code>Mojo</code> to communicate errors.
      *
      * @throws org.apache.maven.plugin.MojoExecutionException if an unexpected problem occurs. Throwing this
-     * exception causes a "BUILD ERROR" message to be displayed.
+     *                                                        exception causes a "BUILD ERROR" message to be displayed.
      * @throws org.apache.maven.plugin.MojoFailureException   if an expected problem (such as a compilation
-     * failure) occurs. Throwing this exception causes a "BUILD FAILURE" message to be displayed.
+     *                                                        failure) occurs. Throwing this exception causes a "BUILD FAILURE" message to be displayed.
      */
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -210,6 +211,26 @@ public class OpenJPAEnhancerMojo extends AbstractWisdomWatcherMojo {
 
         List<File> entities = findEntityClassFiles();
         enhance(entities);
+
+        File persistence = ensurePersistenceXml();
+        final String path = getPathInBundle(persistence);
+        if (path != null) {
+            try {
+                BundlePackager.addExtraHeaderToBundleManifest(basedir, META_PERSISTENCE_HEADER, path);
+            } catch (IOException e) {
+                throw new MojoExecutionException("Cannot save extra headers", e);
+            }
+        } else {
+            getLog().warn("Cannot infer the path of the persistence.xml file in the bundle, " +
+                    "do not forget to set the `Meta-Persistence` header in the `osgi.bnd` file");
+        }
+    }
+
+    private String getPathInBundle(File persistence) {
+        if (WatcherUtils.isInDirectory(persistence, classes)) {
+            return persistence.getAbsolutePath().substring(classes.getAbsolutePath().length());
+        }
+        return null;
     }
 
     /**

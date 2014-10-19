@@ -30,6 +30,9 @@ import org.wisdom.framework.transaction.Transactional;
 
 import javax.transaction.TransactionManager;
 
+/**
+ * The transaction interceptor that manages the transactional execution of an action.
+ */
 @Component
 @Provides(specifications = {Interceptor.class})
 @Instantiate
@@ -45,8 +48,8 @@ public class TransactionInterceptor extends Interceptor<Transactional> {
     }
 
     /**
-     * The interception method. The method should call {@link org.wisdom.api.interception.RequestContext#proceed()} to call the next
-     * interception. Without this call it cuts the chain.
+     * The interception method. The method should call {@link org.wisdom.api.interception.RequestContext#proceed()}
+     * to call the next interception. Without this call it cuts the chain.
      *
      * @param configuration the interception configuration
      * @param context       the interception context

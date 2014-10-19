@@ -109,15 +109,10 @@ class TransactionalEntityManager implements EntityManager {
                 throw new IllegalStateException("Registering synchronization to close EM", e);
             }
 
-            //
             // Make it available for later calls on this thread
-            //
             perThreadEntityManager.set(em);
 
-            //
-            // And make sure it joins the current transaction. I guess
-            // this means that the Jta Data Source is used?
-            //
+            // And make sure it joins the current transaction.
             em.joinTransaction();
             return em;
         } catch (Exception e) {

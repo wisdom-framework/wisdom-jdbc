@@ -27,9 +27,7 @@ import org.wisdom.api.model.Repository;
 import org.wisdom.api.model.RollBackHasCauseAnException;
 
 import javax.persistence.EntityManager;
-import javax.transaction.NotSupportedException;
-import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
+import javax.transaction.*;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 
@@ -94,22 +92,35 @@ public class JTAEntityCrud<T, I extends Serializable> extends AbstractJTACrud<T,
             @Override
             public void close() {
                 try {
-                    // Suspend the transaction.
-                    transaction.suspend();
+                    LOGGER.info("Closing transaction {}", transaction.getTransaction());
                 } catch (SystemException e) {
-                    // Ignore it.
+                    e.printStackTrace();
                 }
+                // Do nothing
             }
         };
+    }
+
+    private Transaction getActiveTransaction() throws SystemException {
+        Transaction tx = transaction.getTransaction();
+        if (tx != null  && tx.getStatus() != Status.STATUS_NO_TRANSACTION) {
+            return tx;
+        } else {
+            return null;
+        }
     }
 
     @Override
     protected <X> X inTransaction(Callable<X> task) {
         boolean transactionBegunLocally = false;
         try {
-            if (transaction.getTransaction() == null) {
+            Transaction tx = getActiveTransaction();
+            if (tx == null) {
+                LOGGER.info("Starting JTA transaction locally");
                 transaction.begin();
                 transactionBegunLocally = true;
+            } else {
+                LOGGER.info("Reusing JTA transaction {}", transaction.getTransaction());
             }
             X result;
             try {
@@ -120,13 +131,16 @@ public class JTAEntityCrud<T, I extends Serializable> extends AbstractJTACrud<T,
                                 "Id: {}] - the transactional block has thrown an exception, rollback the transaction",
                         pu, entity.getName(), idClass.getName(), e);
                 if (transactionBegunLocally) {
+                    LOGGER.error("Rolling back transaction");
                     transaction.rollback();
                 } else {
+                    LOGGER.error("Mark transaction to rollback only");
                     transaction.getTransaction().setRollbackOnly();
                 }
                 return null;
             }
             if (transactionBegunLocally) {
+                LOGGER.info("Committing locally started transaction");
                 transaction.commit();
             }
             return result;

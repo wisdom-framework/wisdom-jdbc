@@ -148,7 +148,7 @@ public class JPAManager {
      * units
      */
     PersistentBundle parse(Bundle bundle) throws Exception {
-        LOGGER.info("Analysing bundle {}", bundle.getBundleId());
+        LOGGER.debug("Analysing bundle {}", bundle.getBundleId());
         String metapersistence = bundle.getHeaders().get(META_PERSISTENCE);
 
         if (metapersistence == null || metapersistence.trim().isEmpty()) {

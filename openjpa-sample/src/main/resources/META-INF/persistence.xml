@@ -5,14 +5,15 @@
 
     <persistence-unit name="open-jpa-sample" transaction-type="JTA">
         <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
-        <!--<jta-data-source>osgi:service/javax.sql.DataSource/(datasource.name=data)</jta-data-source>-->
-        <non-jta-data-source>data</non-jta-data-source>
 
-        <class>models.School</class>
+        <jta-data-source>todo</jta-data-source>
+
+        <class>todo.models.Todo</class>
+        <class>todo.models.TodoList</class>
 
         <properties>
-            <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)"/>
-            <!--<property name="openjpa.TransactionMode" value="local"/>-->
+            <property name="openjpa.jdbc.SynchronizeMappings"
+                      value="buildSchema(SchemaAction='add,deleteTableContents',ForeignKeys=true)"/>
         </properties>
     </persistence-unit>
 </persistence>

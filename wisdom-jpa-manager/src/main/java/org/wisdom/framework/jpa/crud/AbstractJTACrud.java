@@ -376,7 +376,14 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
         return inTransaction(new Callable<T>() {
             @Override
             public T call() throws Exception {
-                entityManager.persist(t);
+                T attached = getAttached(t);
+                if (attached != null) {
+                    // Update
+                    entityManager.merge(t);
+                } else {
+                    // New object
+                    entityManager.persist(t);
+                }
                 return t;
             }
         });

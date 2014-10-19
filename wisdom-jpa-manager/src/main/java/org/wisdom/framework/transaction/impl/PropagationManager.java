@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by clement on 08/10/2014.
+ * Class managing transaction boundaries and action to perform when we enter / leave a transactional bloc.
  */
 public class PropagationManager implements Synchronization {
 
@@ -40,15 +40,50 @@ public class PropagationManager implements Synchronization {
 
     ArrayListMultimap<Thread, Transaction> suspended = ArrayListMultimap.create();
 
+    /**
+     * Creates a new {@link org.wisdom.framework.transaction.impl.PropagationManager}.
+     *
+     * @param manager the transaction manager.
+     */
     public PropagationManager(TransactionManager manager) {
         this.manager = manager;
-
     }
 
+    /**
+     * Checks whether or not we have an active transaction. If so, returns it.
+     *
+     * @return the activate transaction, {@code null} if none.
+     * @throws SystemException thrown by the transaction manager to indicate that it has encountered an
+     *                         unexpected error condition that prevents future transaction services from
+     *                         proceeding.
+     */
+    private Transaction getActiveTransaction() throws SystemException {
+        Transaction tx = manager.getTransaction();
+        if (tx != null && tx.getStatus() != Status.STATUS_NO_TRANSACTION) {
+            return tx;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Enters a transactional bloc.
+     *
+     * @param propagation    the propagation strategy
+     * @param timeout        the transaction timeout
+     * @param interceptionId an identifier for the interception, used for logging.
+     * @throws SystemException       thrown by the transaction manager to indicate that it has encountered an
+     *                               unexpected error condition that prevents future transaction services from
+     *                               proceeding.
+     * @throws NotSupportedException indicates that the request cannot be executed because the operation is not a
+     *                               supported feature.
+     * @throws RollbackException     thrown when the transaction has been marked for rollback only or the transaction
+     *                               has been rolled back instead of committed.
+     */
     public void onEntry(Propagation propagation, int timeout, String interceptionId) throws SystemException,
             NotSupportedException, RollbackException {
 
-        Transaction transaction = manager.getTransaction();
+        Transaction transaction = getActiveTransaction();
         switch (propagation) {
             case REQUIRES:
                 // Are we already in a transaction?
@@ -58,8 +93,9 @@ public class PropagationManager implements Synchronization {
                         manager.setTransactionTimeout(timeout);
                     }
                     manager.begin();
-                    manager.getTransaction().registerSynchronization(this);
-                    owned.add(manager.getTransaction());
+                    Transaction tx = getActiveTransaction();
+                    tx.registerSynchronization(this);
+                    owned.add(tx);
                 } else {
                     // Add the transaction to the transaction list
                     transactions.add(transaction);
@@ -104,7 +140,8 @@ public class PropagationManager implements Synchronization {
                         manager.setTransactionTimeout(timeout);
                     }
                     manager.begin();
-                    owned.add(manager.getTransaction());
+                    Transaction tx = getActiveTransaction();
+                    owned.add(tx);
                 } else {
                     // suspend the current transaction
                     suspended.put(Thread.currentThread(), manager.suspend());
@@ -123,10 +160,26 @@ public class PropagationManager implements Synchronization {
 
     }
 
+    /**
+     * Leaves a transactional bloc. This method decides what do to with the current transaction. This includes
+     * committing or resuming a transaction.
+     *
+     * @param propagation    the propagation strategy
+     * @param interceptionId an identifier for the interception, used for logging.
+     * @param callback       the transaction callback
+     * @throws HeuristicRollbackException  thrown by the commit operation to report that a heuristic decision was
+     *                                     made and that all relevant updates have been rolled back.
+     * @throws HeuristicMixedException     report that a heuristic decision was made and that some relevant updates have
+     *                                     been committed and others have been rolled back
+     * @throws SystemException             thrown by the transaction manager to indicate that it has encountered an
+     *                                     unexpected error condition that prevents future transaction services from
+     *                                     proceeding.
+     * @throws InvalidTransactionException the current transaction is invalid
+     */
     public void onExit(Propagation propagation, String interceptionId,
                        TransactionCallback callback) throws HeuristicRollbackException, HeuristicMixedException, SystemException,
             InvalidTransactionException {
-        Transaction current = manager.getTransaction();
+        Transaction current = getActiveTransaction();
         if (callback == null) {
             callback = new TransactionCallback() {
                 @Override
@@ -151,6 +204,7 @@ public class PropagationManager implements Synchronization {
                         callback.transactionCommitted(current);
                     } catch (RollbackException e) {
                         owned.remove(current);
+                        e.printStackTrace();
                         callback.transactionRolledBack(current);
                     }
                 } // Else wait for commit.
@@ -168,12 +222,12 @@ public class PropagationManager implements Synchronization {
                 // the suspended transaction. If we didn't suspend a transaction, accept the new transaction (user
                 // responsibility)
                 List<Transaction> susp = suspended.get(Thread.currentThread());
-                if (current != null  && ! susp.isEmpty()) {
+                if (current != null && !susp.isEmpty()) {
                     throw new IllegalStateException("Error while handling " + interceptionId + " : you cannot start a" +
                             " transaction after having suspended one. We would not be able to resume the suspended " +
                             "transaction");
-                } else if (current == null  && !susp.isEmpty()) {
-                    manager.resume(susp.remove(susp.size() -1));
+                } else if (current == null && !susp.isEmpty()) {
+                    manager.resume(susp.remove(susp.size() - 1));
                 }
                 break;
             case NEVER:
@@ -214,19 +268,45 @@ public class PropagationManager implements Synchronization {
         }
     }
 
+    /**
+     * Default callback.
+     */
     @Override
     public void beforeCompletion() {
 
     }
 
+    /**
+     * Default callback
+     *
+     * @param status transaction status
+     */
     @Override
     public void afterCompletion(int status) {
 
     }
 
+    /**
+     * A transactional bloc has thrown an exception. This method decides what needs to be done in that case.
+     *
+     * @param e              the exception
+     * @param propagation    the propagation strategy
+     * @param noRollbackFor  the set of exceptions that does not make the current transaction to rollback
+     * @param rollbackFor    the set of exceptions that makes the current transaction to rollback
+     * @param interceptionId an identifier for the interception, used for logging.
+     * @param callback       the transaction callback
+     * @throws SystemException             thrown by the transaction manager to indicate that it has encountered an
+     *                                     unexpected error condition that prevents future transaction services from
+     *                                     proceeding.
+     * @throws HeuristicRollbackException  thrown by the commit operation to report that a heuristic decision was made
+     *                                     and that all relevant updates have been rolled back.
+     * @throws HeuristicMixedException     thrown to report that a heuristic decision was made and that some relevant
+     *                                     updates have been committed and others have been rolled back.
+     * @throws InvalidTransactionException the request carried an invalid transaction context.
+     */
     public void onError(Exception e, Propagation propagation, Class<? extends Exception>[] noRollbackFor,
                         Class<? extends Exception>[] rollbackFor, String interceptionId, TransactionCallback callback) throws SystemException, HeuristicRollbackException, HeuristicMixedException, InvalidTransactionException {
-        Transaction current = manager.getTransaction();
+        Transaction current = getActiveTransaction();
         if (current != null) {
             // We have a transaction.
             // Check whether or not the transaction needs to be marked as rollback only.
