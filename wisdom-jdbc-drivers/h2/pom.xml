@@ -21,6 +21,8 @@
             <groupId>com.h2database</groupId>
             <artifactId>${project.artifactId}</artifactId>
             <version>1.3.172</version>
+            <!-- Classes are embedded in the bundle -->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
