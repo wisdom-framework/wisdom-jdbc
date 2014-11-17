@@ -86,7 +86,7 @@ public class TestWithH2 {
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
 
-        BoneCPDataSources sources = new BoneCPDataSources(context, configuration);
+        BoneCPDataSources sources = new BoneCPDataSources(context).setApplicationConfiguration(configuration);;
         sources.bindFactory(factory, ImmutableMap.of(DataSourceFactory.OSGI_JDBC_DRIVER_CLASS, "org.h2.Driver"));
 
         assertThat(sources).isNotNull();
@@ -137,7 +137,7 @@ public class TestWithH2 {
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
 
-        BoneCPDataSources sources = new BoneCPDataSources(context, configuration);
+        BoneCPDataSources sources = new BoneCPDataSources(context).setApplicationConfiguration(configuration);;
         sources.bindFactory(factory, ImmutableMap.of(DataSourceFactory.OSGI_JDBC_DRIVER_CLASS, "org.h2.Driver"));
 
         assertThat(sources).isNotNull();
@@ -188,7 +188,7 @@ public class TestWithH2 {
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
 
-        BoneCPDataSources sources = new BoneCPDataSources(context, configuration);
+        BoneCPDataSources sources = new BoneCPDataSources(context).setApplicationConfiguration(configuration);;
         sources.bindFactory(factory, ImmutableMap.of(DataSourceFactory.OSGI_JDBC_DRIVER_CLASS, "org.h2.Driver"));
 
         assertThat(sources).isNotNull();

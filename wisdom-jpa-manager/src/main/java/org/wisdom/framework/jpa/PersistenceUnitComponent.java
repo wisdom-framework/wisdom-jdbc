@@ -89,13 +89,13 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
     /**
      * Filter injected in the instance configuration.
      */
-    @Requires(optional = true, proxy = false, nullable = false, id = "jta-ds")
+    @Requires(proxy = false, id = "jta-ds")
     DataSource jtaDataSource;
 
     /**
      * Filter injected in the instance configuration.
      */
-    @Requires(optional = true, proxy = false, nullable = false, id = "ds")
+    @Requires(proxy = false, id = "ds")
     DataSource nonJtaDataSource;
 
     /**

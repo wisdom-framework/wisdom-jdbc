@@ -79,14 +79,6 @@ public class DataSourcesIT extends WisdomTest {
 
     @Test
     public void testH2Memory() throws SQLException, InvalidSyntaxException {
-        Collection<ServiceReference<DataSourceFactory>> factories = context.getServiceReferences(DataSourceFactory
-                .class, null);
-        System.out.println("Factories:");
-        for (ServiceReference<DataSourceFactory> factory : factories) {
-            System.out.println("\t driver: " + factory.getProperty(DataSourceFactory.OSGI_JDBC_DRIVER_CLASS));
-        }
-
-
         assertThat(sources).isNotNull();
 
         assertThat(sources.getDataSources()).containsKeys("h2mem");

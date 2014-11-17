@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  */
 public class WrappedDataSource implements DataSource {
 
-    private final Configuration configuration;
+    private Configuration configuration;
     private final String name;
     private DataSource wrapped;
     private ServiceRegistration<DataSource> registration;
@@ -262,5 +262,10 @@ public class WrappedDataSource implements DataSource {
 
     public DataSource getWrapped() {
         return wrapped;
+    }
+
+    public WrappedDataSource updateConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+        return this;
     }
 }

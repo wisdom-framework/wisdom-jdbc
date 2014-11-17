@@ -19,6 +19,7 @@
  */
 package org.wisdom.framework.jpa;
 
+import com.google.common.base.Strings;
 import org.apache.felix.ipojo.*;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
@@ -99,8 +100,16 @@ public class PersistentBundle {
         configuration.put("bundle", this);
         configuration.put("unit", unit);
         Dictionary<String, String> filters = new Hashtable<>();
-        filters.put("jta-ds", createDataSourceFilter(unit.getJtaDataSource()));
-        filters.put("ds", createDataSourceFilter(unit.getNonJtaDataSource()));
+        if (!Strings.isNullOrEmpty(unit.getJtaDataSource())) {
+            filters.put("jta-ds", createDataSourceFilter(unit.getJtaDataSource()));
+            filters.put("ds", createDataSourceFilter(unit.getJtaDataSource()));
+        }
+        if (! Strings.isNullOrEmpty(unit.getNonJtaDataSource())) {
+            filters.put("ds", createDataSourceFilter(unit.getNonJtaDataSource()));
+            if (filters.get("jta-ds") == null) {
+                filters.put("jta-ds", createDataSourceFilter(unit.getNonJtaDataSource()));
+            }
+        }
         configuration.put("requires.filters", filters);
         LOGGER.info("Creating persistence unit instance for unit {} : {}", unit.getName(), configuration);
         return factory.createComponentInstance(configuration);
@@ -108,7 +117,8 @@ public class PersistentBundle {
 
     static String createDataSourceFilter(String name) {
         if (name == null) {
-            return "(" + DataSources.DATASOURCE_NAME_PROPERTY + "= not-set)";
+//            return "(" + DataSources.DATASOURCE_NAME_PROPERTY + "= not-set)";
+            return null;
         }
         if (name.startsWith("osgi:service/" + DataSource.class.getName() + "/")) {
             return name.substring(("osgi:service/" + DataSource.class.getName() + "/").length());

@@ -76,7 +76,7 @@ public class TestWithDerby {
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
 
-        BoneCPDataSources sources = new BoneCPDataSources(context, configuration);
+        BoneCPDataSources sources = new BoneCPDataSources(context).setApplicationConfiguration(configuration);
         sources.bindFactory(factory, ImmutableMap.of(DataSourceFactory.OSGI_JDBC_DRIVER_CLASS,
                 EmbeddedDriver.class.getName()));
 
@@ -119,7 +119,7 @@ public class TestWithDerby {
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
 
-        BoneCPDataSources sources = new BoneCPDataSources(context, configuration);
+        BoneCPDataSources sources = new BoneCPDataSources(context).setApplicationConfiguration(configuration);
 
 
         assertThat(sources).isNotNull();

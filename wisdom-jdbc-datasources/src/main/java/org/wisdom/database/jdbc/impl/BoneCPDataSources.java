@@ -53,23 +53,23 @@ public class BoneCPDataSources implements DataSources {
     private static final Logger LOGGER = LoggerFactory.getLogger(BoneCPDataSources.class);
     public static final String DB_CONFIGURATION_PREFIX = "db";
 
-    private final Configuration dbConfiguration;
     private final BundleContext context;
 
     /**
      * A boolean indicating if the wisdom server is running in 'dev' mode.
      */
-    private final boolean isDev;
+    private boolean isDev;
 
     private Map<String, WrappedDataSource> sources = new HashMap<>();
 
     private Map<String, DataSourceFactory> drivers = new HashMap<>();
 
-    public BoneCPDataSources(BundleContext context, @Requires ApplicationConfiguration configuration) {
+    @Requires
+    ApplicationConfiguration configuration;
+
+    public BoneCPDataSources(BundleContext context) {
         this.context = context;
-        this.dbConfiguration = configuration.getConfiguration(DB_CONFIGURATION_PREFIX);
-        this.isDev = configuration.isDev();
-        LOGGER.debug("BonCP starting...");
+        LOGGER.debug("BoneCP starting...");
     }
 
     @Override
@@ -150,10 +150,14 @@ public class BoneCPDataSources implements DataSources {
 
     @Validate
     public void onStart() throws SQLException {
+        Configuration dbConfiguration = configuration.getConfiguration(DB_CONFIGURATION_PREFIX);
+        this.isDev = configuration.isDev();
         // Detect all db configurations and create the data sources.
         Set<String> names = new LinkedHashSet<>();
         if (dbConfiguration == null) {
             LOGGER.info("No data sources configured from the configuration, exiting the data source manager");
+            // Remove existing ones
+            sources.clear();
             return;
         }
         Set<String> set = dbConfiguration.asMap().keySet();
@@ -162,9 +166,33 @@ public class BoneCPDataSources implements DataSources {
                 names.add(s.substring(0, s.indexOf(".")));
             }
         }
-        LOGGER.info(names.size() + " data source(s) identified from the configuration : {}", names);
+        LOGGER.info("{} data source(s) identified from the configuration : {}", names.size(), names);
+
+        // Check whether we already have sources
+        // Lost ones need to be removed
+        // New ones need to be added
+        // Remaining one need to be 'reinjected'
+        if (!sources.isEmpty()) {
+            // Remove lost ones
+            for (String k : new HashSet<>(sources.keySet())) {
+                if (!names.contains(k)) {
+                    // Lost one.
+                    LOGGER.info("The data source {} has been removed from configuration");
+                    sources.remove(k);
+                } else if (names.contains(k)) {
+                    // Remaining data source, reconfiguration
+                    LOGGER.info("Reconfiguring data source {}", k);
+                    createDataSource(sources.get(k).updateConfiguration(dbConfiguration.getConfiguration(k)));
+                }
+            }
+        }
 
         for (String name : names) {
+            if (sources.containsKey(name)) {
+                // The data source is already existing.
+                continue;
+            }
+
             Configuration conf = dbConfiguration.getConfiguration(name);
             WrappedDataSource wrapped = new WrappedDataSource(name, conf);
             createDataSource(wrapped);
@@ -200,8 +228,6 @@ public class BoneCPDataSources implements DataSources {
             LOGGER.info("Data source '{}' closed", entry.getKey());
             entry.getValue().unset();
         }
-
-        drivers.clear();
     }
 
     private void createDataSource(WrappedDataSource source) throws SQLException {
@@ -409,5 +435,16 @@ public class BoneCPDataSources implements DataSources {
                 wrapped.unset();
             }
         }
+    }
+
+    /**
+     * For testing purpose only. Injects the application configuration.
+     *
+     * @param configuration the configuration
+     * @return the current {@link org.wisdom.database.jdbc.impl.BoneCPDataSources}
+     */
+    public BoneCPDataSources setApplicationConfiguration(ApplicationConfiguration configuration) {
+        this.configuration = configuration;
+        return this;
     }
 }
