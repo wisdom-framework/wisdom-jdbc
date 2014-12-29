@@ -121,8 +121,9 @@ public class TodoController extends DefaultController {
 
         todoList.getTodos().add(todo);
         todoList = listCrud.save(todoList);
-        logger().info("Todo created : " + todo.getId());
-        return ok(Iterables.getLast(todoList.getTodos())).json();
+        final Todo last = Iterables.getLast(todoList.getTodos());
+        logger().info("Todo created (last) : " + last.getId());
+        return ok(last).json();
     }
 
     @Route(method = POST, uri = "/{id}/{todoId}")

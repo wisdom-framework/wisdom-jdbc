@@ -20,7 +20,7 @@
 package org.wisdom.database.jdbc;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.configuration.MapConfiguration;
+import com.typesafe.config.ConfigFactory;
 import org.h2.Driver;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,8 +80,7 @@ public class TestWithH2 {
                 "default.url", "jdbc:h2:mem:wisdom",
                 "default.logStatements", "true"
         );
-        MapConfiguration h2Conf = new MapConfiguration(map);
-        Configuration conf = new ConfigurationImpl(null, h2Conf);
+        Configuration conf = new ConfigurationImpl(null, ConfigFactory.parseMap(map));
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
@@ -131,8 +130,7 @@ public class TestWithH2 {
                 "my.url", "jdbc:h2:mem:wisdom-2",
                 "my.logStatements", "true"
         );
-        MapConfiguration h2Conf = new MapConfiguration(map);
-        Configuration conf = new ConfigurationImpl(null, h2Conf);
+        Configuration conf = new ConfigurationImpl(null, ConfigFactory.parseMap(map));
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
@@ -182,8 +180,7 @@ public class TestWithH2 {
                 "default.url", "jdbc:h2:target/h2test.db",
                 "default.logStatements", "true"
         );
-        MapConfiguration h2Conf = new MapConfiguration(map);
-        Configuration conf = new ConfigurationImpl(null, h2Conf);
+        Configuration conf = new ConfigurationImpl(null, ConfigFactory.parseMap(map));
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);

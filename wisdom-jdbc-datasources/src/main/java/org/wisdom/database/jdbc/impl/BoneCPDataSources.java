@@ -153,19 +153,13 @@ public class BoneCPDataSources implements DataSources {
         Configuration dbConfiguration = configuration.getConfiguration(DB_CONFIGURATION_PREFIX);
         this.isDev = configuration.isDev();
         // Detect all db configurations and create the data sources.
-        Set<String> names = new LinkedHashSet<>();
         if (dbConfiguration == null) {
             LOGGER.info("No data sources configured from the configuration, exiting the data source manager");
             // Remove existing ones
             sources.clear();
             return;
         }
-        Set<String> set = dbConfiguration.asMap().keySet();
-        for (String s : set) {
-            if (s.contains(".")) {
-                names.add(s.substring(0, s.indexOf(".")));
-            }
-        }
+        Set<String> names = dbConfiguration.asMap().keySet();
         LOGGER.info("{} data source(s) identified from the configuration : {}", names.size(), names);
 
         // Check whether we already have sources

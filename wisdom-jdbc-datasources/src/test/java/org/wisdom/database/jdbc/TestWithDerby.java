@@ -20,7 +20,7 @@
 package org.wisdom.database.jdbc;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.configuration.MapConfiguration;
+import com.typesafe.config.ConfigFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.EmbeddedDriver;
 import org.junit.After;
@@ -70,8 +70,7 @@ public class TestWithDerby {
                 "default.url", "jdbc:derby:memory:sample;create=true",
                 "default.logStatements", "true"
         );
-        MapConfiguration derbyConf = new MapConfiguration(map);
-        Configuration conf = new ConfigurationImpl(null, derbyConf);
+        Configuration conf = new ConfigurationImpl(null, ConfigFactory.parseMap(map));
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
@@ -113,8 +112,7 @@ public class TestWithDerby {
                 "default.url", "jdbc:derby:memory:sample;create=true",
                 "default.logStatements", "true"
         );
-        MapConfiguration derbyConf = new MapConfiguration(map);
-        Configuration conf = new ConfigurationImpl(null, derbyConf);
+        Configuration conf = new ConfigurationImpl(null, ConfigFactory.parseMap(map));
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
         when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);

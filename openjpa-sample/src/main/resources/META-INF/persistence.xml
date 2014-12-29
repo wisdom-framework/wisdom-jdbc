@@ -12,8 +12,13 @@
         <class>todo.models.TodoList</class>
 
         <properties>
+            <!--
+            To delete table content on updates:
             <property name="openjpa.jdbc.SynchronizeMappings"
                       value="buildSchema(SchemaAction='add,deleteTableContents',ForeignKeys=true)"/>
+            -->
+            <property name="openjpa.jdbc.SynchronizeMappings"
+                      value="buildSchema(SchemaAction='add',ForeignKeys=true)"/>
         </properties>
     </persistence-unit>
 </persistence>
