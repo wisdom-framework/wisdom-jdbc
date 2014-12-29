@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
  */
 public class TestWithH2 {
 
-    public static final File DB_FILE = new File("target/h2test.db.h2.db");
+    public static final File DB_FILE = new File("target/h2test.db.mv.db");
 
     @Before
     public void setUp() {
@@ -177,7 +177,7 @@ public class TestWithH2 {
 
         Map<String, Object> map = ImmutableMap.<String, Object>of(
                 "default.driver", "org.h2.Driver",
-                "default.url", "jdbc:h2:target/h2test.db",
+                "default.url", "jdbc:h2:./target/h2test.db",
                 "default.logStatements", "true"
         );
         Configuration conf = new ConfigurationImpl(null, ConfigFactory.parseMap(map));

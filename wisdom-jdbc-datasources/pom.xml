@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>h2</artifactId>
-            <version>1.3.172_2-SNAPSHOT</version>
+            <version>1.4.184_1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -47,13 +47,13 @@
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.7.2_2-SNAPSHOT</version>
+            <version>3.8.7_1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.11_2-SNAPSHOT</version>
+            <version>5.1.34_1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>sqlite-jdbc</artifactId>
-    <version>3.7.2_2-SNAPSHOT</version>
+    <version>3.8.7_1-SNAPSHOT</version>
 
     <packaging>bundle</packaging>
     <properties>
@@ -20,7 +20,8 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.7.2</version>
+            <version>3.8.7</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>

@@ -89,7 +89,7 @@ db.h2mem.logStatements = true
 
 ## H2 - File
 db.h2file.driver = org.h2.Driver
-db.h2file.url = jdbc:h2:target/db/h2-it.db
+db.h2file.url = jdbc:h2:./target/db/h2-it.db
 db.h2file.logStatements = true
 
 #
