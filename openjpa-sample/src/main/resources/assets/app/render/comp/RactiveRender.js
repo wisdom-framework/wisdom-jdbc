@@ -129,7 +129,7 @@ function RactiveRender(){
       el: _container,
       template: _template,
       data: _model,
-      complete: success,
+      oncomplete: success,
       lazy: _lazy,
       twoway: _twoway
     });
