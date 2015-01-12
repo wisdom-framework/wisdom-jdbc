@@ -26,9 +26,9 @@ In the `application.conf` file, we add this configuration:
 ````
 # Data Source configuration
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
-db.todo.driver = org.h2.Driver
-db.todo.url = jdbc:h2:database/todo.db
-db.todo.logStatements = true
+db.todo.driver="org.h2.Driver"
+db.todo.url ="jdbc:h2:database/todo.db"
+db.todo.logStatements=true
 ````
 
 ## Retrieving and playing with entities
