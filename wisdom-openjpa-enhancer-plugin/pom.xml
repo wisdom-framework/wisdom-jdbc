@@ -5,11 +5,11 @@
     <parent>
         <groupId>org.wisdom-framework</groupId>
         <artifactId>wisdom-jdbc</artifactId>
-        <version>0.5</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>wisdom-openjpa-enhancer-plugin</artifactId>
-    <version>0.5</version>
+    <version>0.6-SNAPSHOT</version>
 
     <packaging>maven-plugin</packaging>
 

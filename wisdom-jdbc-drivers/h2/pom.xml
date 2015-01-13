@@ -5,11 +5,11 @@
     <parent>
         <groupId>org.wisdom-framework</groupId>
         <artifactId>wisdom-jdbc-drivers</artifactId>
-        <version>0.5</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>h2</artifactId>
-    <version>1.4.184_1</version>
+    <version>1.4.184_2-SNAPSHOT</version>
 
     <packaging>bundle</packaging>
     <properties>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>abstract-jdbc-driver</artifactId>
-            <version>0.5</version>
+            <version>0.6-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

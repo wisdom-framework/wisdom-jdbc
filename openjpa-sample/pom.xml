@@ -24,7 +24,7 @@
 
     <groupId>org.wisdom-framework.jdbc</groupId>
     <artifactId>openjpa-sample</artifactId>
-    <version>0.5</version>
+    <version>0.6-SNAPSHOT</version>
 
     <packaging>wisdom</packaging>
 
@@ -87,7 +87,7 @@
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>wisdom-jpa-manager</artifactId>
-            <version>0.5</version>
+            <version>0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wisdom-framework</groupId>
@@ -97,7 +97,7 @@
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>wisdom-jdbc-datasources</artifactId>
-            <version>0.5</version>
+            <version>0.6-SNAPSHOT</version>
         </dependency>
 
         <!-- Other applications -->
@@ -145,7 +145,7 @@
             <plugin>
                 <groupId>org.wisdom-framework</groupId>
                 <artifactId>wisdom-openjpa-enhancer-plugin</artifactId>
-                <version>0.5</version>
+                <version>0.6-SNAPSHOT</version>
                 <configuration>
                     <includes>**/models/*.class</includes>
                     <addDefaultConstructor>true</addDefaultConstructor>
