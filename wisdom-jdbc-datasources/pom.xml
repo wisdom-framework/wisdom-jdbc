@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.wisdom-framework</groupId>
         <artifactId>wisdom-jdbc</artifactId>
-        <version>0.5-SNAPSHOT</version>
+        <version>0.5</version>
     </parent>
 
     <artifactId>wisdom-jdbc-datasources</artifactId>
@@ -29,37 +29,37 @@
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.184_1-SNAPSHOT</version>
+            <version>1.4.184_1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>derby</artifactId>
-            <version>10.11.1.1_2-SNAPSHOT</version>
+            <version>10.11.1.1_2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>2.3.2_2-SNAPSHOT</version>
+            <version>2.3.2_2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.8.7_1-SNAPSHOT</version>
+            <version>3.8.7_1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.34_1-SNAPSHOT</version>
+            <version>5.1.34_1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.1-902.jdbc4_1-SNAPSHOT</version>
+            <version>9.1-902.jdbc4_1</version>
             <scope>test</scope>
         </dependency>
         <dependency>

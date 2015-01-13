@@ -5,11 +5,11 @@
     <parent>
         <groupId>org.wisdom-framework</groupId>
         <artifactId>wisdom-jdbc-drivers</artifactId>
-        <version>0.5-SNAPSHOT</version>
+        <version>0.5</version>
     </parent>
 
     <artifactId>derby</artifactId>
-    <version>10.11.1.1_2-SNAPSHOT</version>
+    <version>10.11.1.1_2</version>
 
     <packaging>bundle</packaging>
     <properties>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>abstract-jdbc-driver</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>0.5</version>
         </dependency>
     </dependencies>
 

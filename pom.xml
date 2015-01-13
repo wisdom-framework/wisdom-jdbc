@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>wisdom-jdbc</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.5</version>
 
     <properties>
         <!-- should match Wisdom parent -->
