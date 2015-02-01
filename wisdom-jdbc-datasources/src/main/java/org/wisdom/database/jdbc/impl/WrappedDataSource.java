@@ -30,7 +30,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
@@ -249,6 +251,17 @@ public class WrappedDataSource implements DataSource {
             return;
         }
         Dictionary<String, String> props = new Hashtable<>();
+        Configuration serviceProperties = configuration.getConfiguration("properties");
+        if(serviceProperties!=null){
+            Properties properties = serviceProperties.asProperties();
+            for(Enumeration<Object> keys = properties.keys(); keys.hasMoreElements(); /* NO-OP */){
+                String serviceProp = (String) keys.nextElement();
+                props.put(serviceProp, serviceProperties.getOrDie(serviceProp));
+            }
+        }
+        //
+        //  "name" property value from application.conf will silently override the value from service properties.
+        //
         props.put(DataSources.DATASOURCE_NAME_PROPERTY, name);
         registration = context.registerService(DataSource.class, this, props);
     }
