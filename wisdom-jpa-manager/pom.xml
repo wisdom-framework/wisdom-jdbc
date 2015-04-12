@@ -158,7 +158,6 @@
         <dependency>
             <groupId>org.ow2.chameleon</groupId>
             <artifactId>chameleon-core</artifactId>
-
         </dependency>
     </dependencies>
 
