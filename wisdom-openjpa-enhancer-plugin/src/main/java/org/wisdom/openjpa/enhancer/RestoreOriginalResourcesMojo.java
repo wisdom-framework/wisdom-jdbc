@@ -19,12 +19,11 @@
  */
 package org.wisdom.openjpa.enhancer;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.shared.utils.io.FileUtils;
 import org.wisdom.maven.mojos.AbstractWisdomMojo;
 
 import java.io.File;
@@ -41,18 +40,14 @@ import java.io.IOException;
         defaultPhase = LifecyclePhase.POST_INTEGRATION_TEST)
 public class RestoreOriginalResourcesMojo extends AbstractWisdomMojo {
     /**
-     * Perform whatever build-process behavior this <code>Mojo</code> implements.
-     * <br/>
-     * This is the main trigger for the <code>Mojo</code> inside the <code>Maven</code> system, and allows
-     * the <code>Mojo</code> to communicate errors.
+     * Restore the original persistence.xml to target/classes/META-INF directory.
+     * <br/>.
      *
-     * @throws org.apache.maven.plugin.MojoExecutionException if an unexpected problem occurs. Throwing this
+     * @throws org.apache.maven.plugin.MojoExecutionException if the original persistence.xml is not found. Throwing this
      *                                                        exception causes a "BUILD ERROR" message to be displayed.
-     * @throws org.apache.maven.plugin.MojoFailureException   if an expected problem (such as a compilation
-     *                                                        failure) occurs. Throwing this exception causes a "BUILD FAILURE" message to be displayed.
-     */
+     **/
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException{
         restorePersistenceXmlFile();
     }
 
@@ -70,11 +65,11 @@ public class RestoreOriginalResourcesMojo extends AbstractWisdomMojo {
             getLog().info("Start restoring the original persistence.xml from :" + persistenceOLD.getAbsolutePath());
             FileUtils.forceDelete(persistenceNew);
             FileUtils.copyFile(persistenceOLD, new File(buildDirectory, "classes/META-INF/persistence.xml"));
-            FileUtils.forceDelete(persistenceOLD);
+            FileUtils.deleteQuietly(persistenceOLD);
 
             if (ormMapping.isFile()){
-                getLog().debug("Delete orm.xml from  classes/META-INF/ directory ");
-                FileUtils.forceDelete(ormMapping);
+                getLog().info("Delete orm.xml from  classes/META-INF/ directory ");
+                FileUtils.deleteQuietly(ormMapping);
             }
         } catch (IOException e) {
             e.printStackTrace();

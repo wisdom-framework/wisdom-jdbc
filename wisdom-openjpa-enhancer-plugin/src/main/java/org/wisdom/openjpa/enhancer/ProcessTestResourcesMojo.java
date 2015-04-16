@@ -19,12 +19,11 @@
  */
 package org.wisdom.openjpa.enhancer;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.shared.utils.io.FileUtils;
 import org.wisdom.maven.mojos.AbstractWisdomMojo;
 
 import java.io.File;
@@ -44,18 +43,15 @@ public class ProcessTestResourcesMojo extends AbstractWisdomMojo
 {
 
     /**
-     * Perform whatever build-process behavior this <code>Mojo</code> implements.
-     * <br/>
-     * This is the main trigger for the <code>Mojo</code> inside the <code>Maven</code> system, and allows
-     * the <code>Mojo</code> to communicate errors.
+     * Perform a copy of the original persistence.xml and use the persistence.xml file from test/resources/META-INF directory.
+     * <br/>.
+     * If it found and orm.xml in test/resources/META-INF then it will be copied as well.
      *
-     * @throws org.apache.maven.plugin.MojoExecutionException if an unexpected problem occurs. Throwing this
+     * @throws org.apache.maven.plugin.MojoExecutionException if the persistence.xml dedicated for tests is not found. Throwing this
      *                                                        exception causes a "BUILD ERROR" message to be displayed.
-     * @throws org.apache.maven.plugin.MojoFailureException   if an expected problem (such as a compilation
-     *                                                        failure) occurs. Throwing this exception causes a "BUILD FAILURE" message to be displayed.
-     */
+     **/
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException{
         copyTestPersistenceXmlFile();
     }
 
@@ -72,7 +68,7 @@ public class ProcessTestResourcesMojo extends AbstractWisdomMojo
         try {
             getLog().info("Start saving original persistence.xml from :" + persistenceOLD.getAbsolutePath());
             FileUtils.copyFile(persistenceOLD, new File(buildDirectory, "classes/META-INF/persistence.xml.proper"));
-            FileUtils.forceDelete(persistenceOLD);
+            FileUtils.deleteQuietly(persistenceOLD);
             getLog().info("Copy persistence.xml from test/resources/META-INF/ directory to classes/META-INF/ directory ");
             FileUtils.copyFile(persistenceForTest, persistenceOLD);
 
