@@ -72,7 +72,8 @@ public class RestoreOriginalResourcesMojo extends AbstractWisdomMojo {
                 FileUtils.deleteQuietly(ormMapping);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().warn("IOException when restoring the original persistence.xml");
+            throw new MojoExecutionException("Cannot continue the restoring of the persistence.xml", e);
         }
 
     }

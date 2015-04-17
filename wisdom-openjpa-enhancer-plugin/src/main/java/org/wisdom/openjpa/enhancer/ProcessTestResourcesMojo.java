@@ -73,11 +73,12 @@ public class ProcessTestResourcesMojo extends AbstractWisdomMojo
             FileUtils.copyFile(persistenceForTest, persistenceOLD);
 
             if (ormMapping.isFile()){
-                getLog().debug("Copy orm.xml test/resources/META-INF/ directory to classes/META-INF/ directory ");
+                getLog().info("Copy orm.xml test/resources/META-INF/ directory to classes/META-INF/ directory ");
                 FileUtils.copyFile(ormMapping, new File(buildDirectory, "classes/META-INF/orm.xml"));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            getLog().warn("IOException when copying the original persistence.xml");
+            throw new MojoExecutionException("Cannot continue the copying of the persistence.xml", e);
         }
 
     }
