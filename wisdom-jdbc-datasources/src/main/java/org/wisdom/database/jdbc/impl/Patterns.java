@@ -19,7 +19,8 @@
  */
 package org.wisdom.database.jdbc.impl;
 
-import com.jolbox.bonecp.BoneCPDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,7 +47,7 @@ public class Patterns {
      * @param isDev      a boolean indicating if the wisdom server is running in 'dev' mode.
      * @return {@literal true} if the data soruce was populated, {@literal false} otherwise
      */
-    public static boolean populate(BoneCPDataSource datasource, String url, boolean isDev) {
+    public static boolean populate(HikariConfig datasource, String url, boolean isDev) {
         Matcher matcher = MYSQL_URL.matcher(url);
         if (matcher.matches()) {
             populateForMySQLFull(matcher, url, datasource);
@@ -65,7 +66,7 @@ public class Patterns {
         return false;
     }
 
-    private static void populateForMySQLFull(Matcher matcher, String url, BoneCPDataSource datasource) {
+    private static void populateForMySQLFull(Matcher matcher, String url, HikariConfig datasource) {
         String username = matcher.group(1);
         String password = matcher.group(2);
         String host = matcher.group(3);
@@ -80,7 +81,7 @@ public class Patterns {
         datasource.setPassword(password);
     }
 
-    private static void populateForH2(String url, BoneCPDataSource datasource,
+    private static void populateForH2(String url, HikariConfig datasource,
                                       boolean isDev) {
         if (!url.contains("DB_CLOSE_DELAY") && isDev) {
             datasource.setJdbcUrl(url + ";DB_CLOSE_DELAY=-1");

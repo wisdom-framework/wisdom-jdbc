@@ -32,7 +32,7 @@ import org.osgi.service.jdbc.DataSourceFactory;
 import org.wisdom.api.configuration.ApplicationConfiguration;
 import org.wisdom.api.configuration.Configuration;
 import org.wisdom.configuration.ConfigurationImpl;
-import org.wisdom.database.jdbc.impl.BoneCPDataSources;
+import org.wisdom.database.jdbc.impl.HikariCPDataSources;
 
 import java.io.File;
 import java.sql.ResultSet;
@@ -83,9 +83,9 @@ public class TestWithH2 {
         Configuration conf = new ConfigurationImpl(null, ConfigFactory.parseMap(map));
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
-        when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
+        when(configuration.getConfiguration(HikariCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
 
-        BoneCPDataSources sources = new BoneCPDataSources(context).setApplicationConfiguration(configuration);;
+        HikariCPDataSources sources = new HikariCPDataSources(context).setApplicationConfiguration(configuration);;
         sources.bindFactory(factory, ImmutableMap.of(DataSourceFactory.OSGI_JDBC_DRIVER_CLASS, "org.h2.Driver"));
 
         assertThat(sources).isNotNull();
@@ -133,9 +133,9 @@ public class TestWithH2 {
         Configuration conf = new ConfigurationImpl(null, ConfigFactory.parseMap(map));
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
-        when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
+        when(configuration.getConfiguration(HikariCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
 
-        BoneCPDataSources sources = new BoneCPDataSources(context).setApplicationConfiguration(configuration);;
+        HikariCPDataSources sources = new HikariCPDataSources(context).setApplicationConfiguration(configuration);;
         sources.bindFactory(factory, ImmutableMap.of(DataSourceFactory.OSGI_JDBC_DRIVER_CLASS, "org.h2.Driver"));
 
         assertThat(sources).isNotNull();
@@ -183,9 +183,9 @@ public class TestWithH2 {
         Configuration conf = new ConfigurationImpl(null, ConfigFactory.parseMap(map));
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
-        when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
+        when(configuration.getConfiguration(HikariCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
 
-        BoneCPDataSources sources = new BoneCPDataSources(context).setApplicationConfiguration(configuration);;
+        HikariCPDataSources sources = new HikariCPDataSources(context).setApplicationConfiguration(configuration);;
         sources.bindFactory(factory, ImmutableMap.of(DataSourceFactory.OSGI_JDBC_DRIVER_CLASS, "org.h2.Driver"));
 
         assertThat(sources).isNotNull();

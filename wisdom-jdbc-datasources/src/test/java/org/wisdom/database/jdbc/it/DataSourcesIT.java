@@ -22,18 +22,14 @@ package org.wisdom.database.jdbc.it;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.jdbc.DataSourceFactory;
 import org.wisdom.database.jdbc.Statements;
 import org.wisdom.database.jdbc.service.DataSources;
 import org.wisdom.test.parents.WisdomTest;
 
 import javax.inject.Inject;
-import javax.sql.DataSource;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -69,13 +65,8 @@ public class DataSourcesIT extends WisdomTest {
         results.next();
         assertThat(results.getString(2).trim()).isEqualTo("Caribou");
         results.close();
-
-
-        // Check the Data Source service
-        Collection<ServiceReference<DataSource>> refs = context.getServiceReferences(DataSource.class,
-                "(datasource.name=derby)");
-        assertThat(refs).isNotNull().isNotEmpty().hasSize(1);
     }
+
 
     @Test
     public void testH2Memory() throws SQLException, InvalidSyntaxException {
@@ -95,12 +86,6 @@ public class DataSourcesIT extends WisdomTest {
         results.next();
         assertThat(results.getString(2).trim()).isEqualTo("Caribou");
         results.close();
-
-
-        // Check the Data Source service
-        Collection<ServiceReference<DataSource>> refs = context.getServiceReferences(DataSource.class,
-                "(datasource.name=h2mem)");
-        assertThat(refs).isNotNull().isNotEmpty().hasSize(1);
     }
 
 
@@ -122,12 +107,6 @@ public class DataSourcesIT extends WisdomTest {
         results.next();
         assertThat(results.getString(2).trim()).isEqualTo("Caribou");
         results.close();
-
-
-        // Check the Data Source service
-        Collection<ServiceReference<DataSource>> refs = context.getServiceReferences(DataSource.class,
-                "(datasource.name=h2file)");
-        assertThat(refs).isNotNull().isNotEmpty().hasSize(1);
     }
 
     @Test
@@ -149,12 +128,6 @@ public class DataSourcesIT extends WisdomTest {
         results.next();
         assertThat(results.getString(2).trim()).isEqualTo("Caribou");
         results.close();
-
-
-        // Check the Data Source service
-        Collection<ServiceReference<DataSource>> refs = context.getServiceReferences(DataSource.class,
-                "(datasource.name=" + database + ")");
-        assertThat(refs).isNotNull().isNotEmpty().hasSize(1);
     }
 
     @Test
@@ -175,12 +148,6 @@ public class DataSourcesIT extends WisdomTest {
         results.next();
         assertThat(results.getString(2).trim()).isEqualTo("Caribou");
         results.close();
-
-
-        // Check the Data Source service
-        Collection<ServiceReference<DataSource>> refs = context.getServiceReferences(DataSource.class,
-                "(datasource.name=hsqlfile)");
-        assertThat(refs).isNotNull().isNotEmpty().hasSize(1);
     }
 
     @Test
@@ -202,11 +169,7 @@ public class DataSourcesIT extends WisdomTest {
         results.next();
         assertThat(results.getString(2).trim()).isEqualTo("Caribou");
         results.close();
-
-        // Check the Data Source service
-        Collection<ServiceReference<DataSource>> refs = context.getServiceReferences(DataSource.class,
-                "(datasource.name=" + database + ")");
-        assertThat(refs).isNotNull().isNotEmpty().hasSize(1);
     }
+
 
 }

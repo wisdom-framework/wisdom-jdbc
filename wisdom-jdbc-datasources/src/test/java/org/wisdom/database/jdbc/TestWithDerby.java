@@ -33,7 +33,7 @@ import org.osgi.service.jdbc.DataSourceFactory;
 import org.wisdom.api.configuration.ApplicationConfiguration;
 import org.wisdom.api.configuration.Configuration;
 import org.wisdom.configuration.ConfigurationImpl;
-import org.wisdom.database.jdbc.impl.BoneCPDataSources;
+import org.wisdom.database.jdbc.impl.HikariCPDataSources;
 
 import java.io.File;
 import java.sql.ResultSet;
@@ -60,7 +60,6 @@ public class TestWithDerby {
         File log = new File("derby.log");
         FileUtils.deleteQuietly(log);
     }
-
     @Test
     public void testDerby() throws ClassNotFoundException, SQLException {
         BundleContext context = prepareContext();
@@ -73,9 +72,9 @@ public class TestWithDerby {
         Configuration conf = new ConfigurationImpl(null, ConfigFactory.parseMap(map));
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
-        when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
+        when(configuration.getConfiguration(HikariCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
 
-        BoneCPDataSources sources = new BoneCPDataSources(context).setApplicationConfiguration(configuration);
+        HikariCPDataSources sources = new HikariCPDataSources(context).setApplicationConfiguration(configuration);
         sources.bindFactory(factory, ImmutableMap.of(DataSourceFactory.OSGI_JDBC_DRIVER_CLASS,
                 EmbeddedDriver.class.getName()));
 
@@ -103,7 +102,7 @@ public class TestWithDerby {
         sources.onStop();
     }
 
-    @Test
+   @Test
     public void testDynamism() throws ClassNotFoundException, SQLException {
         BundleContext context = prepareContext();
 
@@ -115,15 +114,15 @@ public class TestWithDerby {
         Configuration conf = new ConfigurationImpl(null, ConfigFactory.parseMap(map));
 
         ApplicationConfiguration configuration = mock(ApplicationConfiguration.class);
-        when(configuration.getConfiguration(BoneCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
+        when(configuration.getConfiguration(HikariCPDataSources.DB_CONFIGURATION_PREFIX)).thenReturn(conf);
 
-        BoneCPDataSources sources = new BoneCPDataSources(context).setApplicationConfiguration(configuration);
+       HikariCPDataSources sources = new HikariCPDataSources(context).setApplicationConfiguration(configuration);
 
 
         assertThat(sources).isNotNull();
         sources.onStart();
 
-        // No driver
+      // No driver
         assertThat(sources.getDataSources()).hasSize(0);
 
 

@@ -19,7 +19,7 @@
  */
 package org.wisdom.database.jdbc.impl;
 
-import com.jolbox.bonecp.BoneCPDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,62 +33,62 @@ public class PatternsTest {
     public void testPostgresOnLocalhost() {
         String url = "jdbc:postgresql://localhost/test";
 
-        BoneCPDataSource source = new BoneCPDataSource();
+        HikariDataSource source = new HikariDataSource();
 
         assertThat(Patterns.populate(source, url, false)).isFalse();
-        assertThat(source.getConfig().getJdbcUrl()).isEqualTo(url);
-        assertThat(source.getConfig().getUsername()).isNull();
+        assertThat(source.getJdbcUrl()).isEqualTo(url);
+        assertThat(source.getUsername()).isNull();
     }
 
     @Test
     public void testWithMySQLWithoutAttributes() {
         String url = "mysql://clement:secret@localhost/test";
 
-        BoneCPDataSource source = new BoneCPDataSource();
+        HikariDataSource source = new HikariDataSource();
         assertThat(Patterns.populate(source, url, false)).isTrue();
 
-        assertThat(source.getConfig().getJdbcUrl())
+        assertThat(source.getJdbcUrl())
                 .isEqualTo(
                         "jdbc:mysql://localhost/test?useUnicode=yes&characterEncoding=UTF-8&connectionCollation" +
                                 "=utf8_general_ci");
-        assertThat(source.getConfig().getUsername()).isEqualTo("clement");
-        assertThat(source.getConfig().getPassword()).isEqualTo("secret");
+        assertThat(source.getUsername()).isEqualTo("clement");
+        assertThat(source.getPassword()).isEqualTo("secret");
     }
 
     @Test
     public void testWithMySQLWithAttributes() {
         String url = "mysql://clement:secret@localhost:3306/wisdom?useUnicode=true&characterEncoding=utf8";
 
-        BoneCPDataSource source = new BoneCPDataSource();
+        HikariDataSource source = new HikariDataSource();
         assertThat(Patterns.populate(source, url, false)).isTrue();
 
-        assertThat(source.getConfig().getJdbcUrl())
+        assertThat(source.getJdbcUrl())
                 .isEqualTo(
                         "jdbc:mysql://localhost:3306/wisdom?useUnicode=true&characterEncoding=utf8");
-        assertThat(source.getConfig().getUsername()).isEqualTo("clement");
-        assertThat(source.getConfig().getPassword()).isEqualTo("secret");
+        assertThat(source.getUsername()).isEqualTo("clement");
+        assertThat(source.getPassword()).isEqualTo("secret");
     }
 
     @Test
     public void testH2InDevMode() {
         String url = "jdbc:h2:mem:h2-mem-it";
 
-        BoneCPDataSource source = new BoneCPDataSource();
+        HikariDataSource source = new HikariDataSource();
 
         assertThat(Patterns.populate(source, url, true)).isTrue();
-        assertThat(source.getConfig().getJdbcUrl()).isEqualTo(url + ";DB_CLOSE_DELAY=-1");
-        assertThat(source.getConfig().getUsername()).isNull();
+        assertThat(source.getJdbcUrl()).isEqualTo(url + ";DB_CLOSE_DELAY=-1");
+        assertThat(source.getUsername()).isNull();
     }
 
     @Test
     public void testH2InProdMode() {
         String url = "jdbc:h2:mem:h2-mem-it";
 
-        BoneCPDataSource source = new BoneCPDataSource();
+        HikariDataSource source = new HikariDataSource();
 
         assertThat(Patterns.populate(source, url, false)).isTrue();
-        assertThat(source.getConfig().getJdbcUrl()).isEqualTo(url);
-        assertThat(source.getConfig().getUsername()).isNull();
+        assertThat(source.getJdbcUrl()).isEqualTo(url);
+        assertThat(source.getUsername()).isNull();
     }
 
 }

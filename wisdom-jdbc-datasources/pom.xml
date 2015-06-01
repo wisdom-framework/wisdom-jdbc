@@ -20,10 +20,17 @@
         </dependency>
         <!-- The connection pool -->
         <dependency>
-            <groupId>com.jolbox</groupId>
-            <artifactId>bonecp</artifactId>
-            <version>0.8.0.RELEASE</version>
-            <scope>provided</scope>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>2.3.6</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.19.0-GA</version>
+            <scope>compile</scope>
         </dependency>
         <!-- The JDBC drivers used for IT -->
         <dependency>
@@ -32,12 +39,14 @@
             <version>1.4.184_2-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>derby</artifactId>
             <version>10.11.1.1_3-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>hsqldb</artifactId>
@@ -50,29 +59,34 @@
             <version>3.8.7_2-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.34_2-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>postgresql</artifactId>
             <version>9.1-903.jdbc4_1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.enterprise</artifactId>
             <version>5.0.0</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>wisdom-api</artifactId>
             <version>${wisdom.version}</version>
         </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>wisdom-test</artifactId>
@@ -86,6 +100,7 @@
             <version>1.8.5</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
@@ -95,16 +110,22 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.ipojo.annotations</artifactId>
         </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
+
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jcl</artifactId>
             <version>1.7.6</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <!-- Used in test -->
             <groupId>${project.groupId}</groupId>
@@ -112,10 +133,12 @@
             <version>${wisdom.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
         </dependency>
+
     </dependencies>
 
 
@@ -124,8 +147,8 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>

@@ -1,7 +1,4 @@
-Private-Package: org.wisdom.database.jdbc.impl,  \
-    com.jolbox.bonecp;-split-package:=merge-first, \
-    com.jolbox.bonecp.hooks, \
-    com.jolbox.bonecp.proxy
+Private-Package: org.wisdom.database.jdbc.impl
 Export-Package:org.wisdom.database.jdbc.service, \
-    org.osgi.service.jdbc;-split-package:=merge-first, \
-    org.wisdom.database.jdbc.utils
+   org.osgi.service.jdbc;-split-package:=merge-first, \
+   org.wisdom.database.jdbc.utils
