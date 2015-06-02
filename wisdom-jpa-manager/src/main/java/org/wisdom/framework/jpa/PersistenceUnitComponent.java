@@ -199,9 +199,10 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
             if (persistenceUnitXml.getTransactionType() ==
                     org.wisdom.framework.jpa.model.PersistenceUnitTransactionType.RESOURCE_LOCAL) {
                 entityManagerFactory = provider.createContainerEntityManagerFactory(this, map);
-                emfRegistration = bundleContext.registerService(EntityManagerFactory.class, entityManagerFactory, properties);
 
                 entityManager = entityManagerFactory.createEntityManager();
+
+                emfRegistration = bundleContext.registerService(EntityManagerFactory.class, entityManagerFactory, properties);
                 emRegistration = bundleContext.registerService(EntityManager.class,
                         entityManager, properties);
 
@@ -211,6 +212,7 @@ public class PersistenceUnitComponent implements PersistenceUnitInfo {
                 // JTA
                 entityManagerFactory = provider.createContainerEntityManagerFactory(this, map);
                 entityManager = new TransactionalEntityManager(transactionManager, entityManagerFactory, this);
+
                 emRegistration = bundleContext.registerService(EntityManager.class,
                         entityManager, properties);
                 emfRegistration = bundleContext.registerService(EntityManagerFactory.class, entityManagerFactory, properties);
