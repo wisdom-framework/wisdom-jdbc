@@ -9,6 +9,8 @@ Basically, for each configured data source, a `javax.sql.DataSource` service is 
 access the data source. This service manages the connections to the data source. The `org.wisdom.database.jdbc
 .service.DataSources` service is also exposed to retrieve the list of configured data sources.
 
+**IMPORTANT**: Wisdom-jdbc requires JDK 8 to be built.
+
 ## Supported databases
 
 The Wisdom-JDBC project is compatible with any implementation of the `org.osgi.service.jdbc.DataSourceFactory`.

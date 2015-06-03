@@ -406,9 +406,6 @@ public class HikariCPDataSources implements DataSources {
     }
 
     private void register(BundleContext context, DataSource ds, String dbName) {
-        if (registration != null) {
-            return;
-        }
         Dictionary<String, String> props = new Hashtable<>();
         Configuration serviceProperties = configuration.getConfiguration("properties");
         if(serviceProperties!=null){
