@@ -21,9 +21,6 @@ package org.wisdom.database.jdbc.service;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 /**

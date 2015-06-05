@@ -23,7 +23,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.jdbc.DataSourceFactory;
 import org.wisdom.database.jdbc.Statements;
 import org.wisdom.database.jdbc.service.DataSources;
 import org.wisdom.test.parents.WisdomTest;
@@ -70,12 +69,13 @@ public class DataSourcesIT extends WisdomTest {
         assertThat(results.getString(2).trim()).isEqualTo("Caribou");
         results.close();
 
-
         // Check the Data Source service
         Collection<ServiceReference<DataSource>> refs = context.getServiceReferences(DataSource.class,
                 "(datasource.name=derby)");
         assertThat(refs).isNotNull().isNotEmpty().hasSize(1);
+
     }
+
 
     @Test
     public void testH2Memory() throws SQLException, InvalidSyntaxException {
@@ -95,7 +95,6 @@ public class DataSourcesIT extends WisdomTest {
         results.next();
         assertThat(results.getString(2).trim()).isEqualTo("Caribou");
         results.close();
-
 
         // Check the Data Source service
         Collection<ServiceReference<DataSource>> refs = context.getServiceReferences(DataSource.class,
@@ -123,7 +122,6 @@ public class DataSourcesIT extends WisdomTest {
         assertThat(results.getString(2).trim()).isEqualTo("Caribou");
         results.close();
 
-
         // Check the Data Source service
         Collection<ServiceReference<DataSource>> refs = context.getServiceReferences(DataSource.class,
                 "(datasource.name=h2file)");
@@ -150,7 +148,6 @@ public class DataSourcesIT extends WisdomTest {
         assertThat(results.getString(2).trim()).isEqualTo("Caribou");
         results.close();
 
-
         // Check the Data Source service
         Collection<ServiceReference<DataSource>> refs = context.getServiceReferences(DataSource.class,
                 "(datasource.name=" + database + ")");
@@ -175,7 +172,6 @@ public class DataSourcesIT extends WisdomTest {
         results.next();
         assertThat(results.getString(2).trim()).isEqualTo("Caribou");
         results.close();
-
 
         // Check the Data Source service
         Collection<ServiceReference<DataSource>> refs = context.getServiceReferences(DataSource.class,
@@ -210,3 +206,4 @@ public class DataSourcesIT extends WisdomTest {
     }
 
 }
+
