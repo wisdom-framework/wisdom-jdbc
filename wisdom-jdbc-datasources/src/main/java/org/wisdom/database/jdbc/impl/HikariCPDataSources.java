@@ -398,7 +398,7 @@ public class HikariCPDataSources implements DataSources {
 
     private void shutdownPool(HikariDataSource source) {
         LOGGER.info("Shutting down connection pool.");
-        if (source instanceof HikariDataSource) {
+        if (source != null) {
             source.shutdown();
         } else {
             throw new IllegalArgumentException("Cannot close a data source not managed by the manager :" + source);
