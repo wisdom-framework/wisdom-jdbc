@@ -9,7 +9,8 @@
     </parent>
 
     <artifactId>postgresql</artifactId>
-    <version>9.4-1201-jdbc41-SNAPSHOT</version>
+    <version>9.4-1201-jdbc41_1-SNAPSHOT</version>
+
 
     <packaging>bundle</packaging>
     <properties>
