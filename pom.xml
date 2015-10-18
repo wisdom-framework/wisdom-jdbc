@@ -1,126 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.wisdom-framework</groupId>
-        <artifactId>wisdom-framework</artifactId>
-        <version>0.10.0-SNAPSHOT</version>
-    </parent>
+  <parent>
+    <groupId>org.wisdom-framework</groupId>
+    <artifactId>wisdom-framework</artifactId>
+    <version>0.10.0-SNAPSHOT</version>
+  </parent>
 
-    <artifactId>wisdom-jdbc</artifactId>
-    <version>0.6-SNAPSHOT</version>
+  <artifactId>wisdom-jdbc</artifactId>
+  <version>0.6-SNAPSHOT</version>
 
-    <properties>
-        <!-- should match Wisdom parent -->
-        <wisdom.version>0.10.0-SNAPSHOT</wisdom.version>
-    </properties>
+  <properties>
+    <!-- should match Wisdom parent -->
+    <wisdom.version>0.10.0-SNAPSHOT</wisdom.version>
+  </properties>
 
-    <packaging>pom</packaging>
+  <packaging>pom</packaging>
 
-    <description>JDBC integration into Wisdom-Framework</description>
+  <description>JDBC integration into Wisdom-Framework</description>
 
-    <modules>
-        <module>wisdom-jdbc-drivers</module>
-        <module>wisdom-jdbc-datasources</module>
-        <module>wisdom-jpa-manager</module>
-        <module>wisdom-openjpa-enhancer-plugin</module>
-        <module>openjpa-sample</module>
-    </modules>
+  <modules>
+    <module>wisdom-jdbc-drivers</module>
+    <module>wisdom-jdbc-datasources</module>
+    <module>wisdom-jpa-manager</module>
+    <module>wisdom-openjpa-enhancer-plugin</module>
+    <module>openjpa-sample</module>
+  </modules>
 
-    <scm>
-        <url>https://github.com/wisdom-framework/wisdom-jdbc/</url>
-        <connection>scm:git:git@github.com:wisdom-framework/wisdom-jdbc.git</connection>
-        <developerConnection>scm:git:git@github.com:wisdom-framework/wisdom-jdbc.git</developerConnection>
-      <tag>HEAD</tag>
+  <scm>
+    <url>https://github.com/wisdom-framework/wisdom-jdbc/</url>
+    <connection>scm:git:git@github.com:wisdom-framework/wisdom-jdbc.git</connection>
+    <developerConnection>scm:git:git@github.com:wisdom-framework/wisdom-jdbc.git</developerConnection>
+    <tag>HEAD</tag>
   </scm>
 
-    <repositories>
-        <repository>
-            <id>oss-sonatype-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </repository>
-    </repositories>
+  <repositories>
+    <repository>
+      <id>oss-sonatype-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </repository>
+  </repositories>
 
-    <profiles>
-        <profile>
-            <!-- require until the released Wisdom parent define the release profile -->
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                                <phase>verify</phase>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <passphrase>${gpg.passphrase}</passphrase>
-                            <useAgent>true</useAgent>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>2.2.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadoc</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- We need to create a zip containing a buildable version of the project -->
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.apache.apache.resources</groupId>
-                                <artifactId>apache-source-release-assembly-descriptor</artifactId>
-                                <version>1.0.4</version>
-                            </dependency>
-                        </dependencies>
-                        <executions>
-                            <execution>
-                                <id>source-release-assembly</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                                <configuration>
-                                    <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
-                                    <descriptorRefs>
-                                        <descriptorRef>source-release</descriptorRef>
-                                    </descriptorRefs>
-                                    <tarLongFileMode>gnu</tarLongFileMode>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+  <profiles>
+    <profile>
+      <!-- require until the released Wisdom parent define the release profile -->
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <phase>verify</phase>
+              </execution>
+            </executions>
+            <configuration>
+              <passphrase>${gpg.passphrase}</passphrase>
+              <useAgent>true</useAgent>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9.1</version>
+            <executions>
+              <execution>
+                <id>attach-javadoc</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- We need to create a zip containing a buildable version of the project -->
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>org.apache.apache.resources</groupId>
+                <artifactId>apache-source-release-assembly-descriptor</artifactId>
+                <version>1.0.4</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <id>source-release-assembly</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
+                  <descriptorRefs>
+                    <descriptorRef>source-release</descriptorRef>
+                  </descriptorRefs>
+                  <tarLongFileMode>gnu</tarLongFileMode>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
