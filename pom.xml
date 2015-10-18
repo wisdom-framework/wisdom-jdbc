@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.wisdom-framework</groupId>
         <artifactId>wisdom-framework</artifactId>
-        <version>0.7.0</version>
+        <version>0.10.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>wisdom-jdbc</artifactId>
@@ -13,7 +13,7 @@
 
     <properties>
         <!-- should match Wisdom parent -->
-        <wisdom.version>0.7.0</wisdom.version>
+        <wisdom.version>0.10.0-SNAPSHOT</wisdom.version>
     </properties>
 
     <packaging>pom</packaging>
@@ -34,6 +34,13 @@
         <developerConnection>scm:git:git@github.com:wisdom-framework/wisdom-jdbc.git</developerConnection>
       <tag>HEAD</tag>
   </scm>
+
+    <repositories>
+        <repository>
+            <id>oss-sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
 
     <profiles>
         <profile>

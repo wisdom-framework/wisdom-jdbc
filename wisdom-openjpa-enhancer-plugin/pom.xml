@@ -18,14 +18,14 @@
         <mavenPluginPluginVersion>3.2</mavenPluginPluginVersion>
         <plexusCompilerVersion>2.2</plexusCompilerVersion>
 
-        <openjpa.version>2.2.0</openjpa.version>
+        <openjpa.version>2.4.0</openjpa.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>wisdom-maven-plugin</artifactId>
-            <version>0.7.0</version>
+            <version>0.10.0-SNAPSHOT</version>
         </dependency>
 
 
