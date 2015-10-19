@@ -17,6 +17,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -96,6 +97,11 @@
             <artifactId>wisdom-jdbc-datasources</artifactId>
             <version>0.6-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
 
 
         <!-- For Testing purpose -->
@@ -117,6 +123,12 @@
             <groupId>org.apache.openjpa</groupId>
             <artifactId>openjpa</artifactId>
             <version>2.4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xbean</groupId>
+            <artifactId>xbean-asm5-shaded</artifactId>
+            <version>3.17</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -165,7 +165,7 @@ public class JPAManager {
 
         // We can have multiple persistence units.
         Set<Persistence.PersistenceUnit> set = new HashSet<>();
-        for (String location : Splitter.on(",").omitEmptyStrings().trimResults().splitToList(metapersistence)) {
+        for (String location : Splitter.on(",").omitEmptyStrings().trimResults().split(metapersistence)) {
             LOGGER.info("Analysing location {}", location);
             // Lets remember where we came from
             Persistence.PersistenceUnit.Properties.Property p =
