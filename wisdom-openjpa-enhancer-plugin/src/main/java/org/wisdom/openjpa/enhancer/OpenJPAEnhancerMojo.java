@@ -216,7 +216,8 @@ public class OpenJPAEnhancerMojo extends AbstractWisdomWatcherMojo {
         final String path = getPathInBundle(persistence);
         if (path != null) {
             try {
-                BundlePackager.addExtraHeaderToBundleManifest(basedir, META_PERSISTENCE_HEADER, path);
+                BundlePackager.addExtraHeaderToBundleManifest(basedir, META_PERSISTENCE_HEADER,
+                    path.replace("\\", "/")); // Invert path separator on windows.
             } catch (IOException e) {
                 throw new MojoExecutionException("Cannot save extra headers", e);
             }
