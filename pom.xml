@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -10,11 +10,12 @@
   </parent>
 
   <artifactId>wisdom-jdbc</artifactId>
-  <version>0.6-SNAPSHOT</version>
+  <version>0.10.0-SNAPSHOT</version>
 
   <properties>
     <!-- should match Wisdom parent -->
     <wisdom.version>0.10.0-SNAPSHOT</wisdom.version>
+    <openjpa.version>2.4.1</openjpa.version>
   </properties>
 
   <packaging>pom</packaging>
@@ -43,16 +44,34 @@
     </repository>
   </repositories>
 
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
   <profiles>
+
     <profile>
       <!-- require until the released Wisdom parent define the release profile -->
       <id>release</id>
       <build>
-        <plugins>
+
+          <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
+            <version>1.6</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -67,10 +86,11 @@
               <useAgent>true</useAgent>
             </configuration>
           </plugin>
+
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>2.2.1</version>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-source-plugin</artifactId>
+              <version>3.0.0</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -80,10 +100,11 @@
               </execution>
             </executions>
           </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
+            <version>2.10.3</version>
             <executions>
               <execution>
                 <id>attach-javadoc</id>
@@ -93,7 +114,9 @@
               </execution>
             </executions>
           </plugin>
+
           <!-- We need to create a zip containing a buildable version of the project -->
+
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
             <dependencies>
