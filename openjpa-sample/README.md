@@ -27,7 +27,7 @@ In the `application.conf` file, we add this configuration:
 # Data Source configuration
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 db.todo.driver="org.h2.Driver"
-db.todo.url ="jdbc:h2:database/todo.db"
+db.todo.url ="jdbc:h2:./database/todo.db"
 db.todo.logStatements=true
 ````
 
@@ -94,45 +94,32 @@ Here are the list of the Maven dependencies to use:
         <dependency>
             <groupId>org.apache.openjpa</groupId>
             <artifactId>openjpa</artifactId>
-            <version>2.3.0</version>
+            <version>2.4.1</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-servlet_2.5_spec</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <!--Because ot the split packager from rt.jar, JTA is declared as a library -->
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jta_1.1_spec</artifactId>
-            <version>1.1.1</version>
-        </dependency>
+
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
             <version>1.4</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.serp</artifactId>
-            <version>1.14.1_1</version>
+            <version>1.15.1_1</version>
         </dependency>
 
         <!-- JPA support and data source -->
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>wisdom-jpa-manager</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>0.10.0-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>h2</artifactId>
             <version>1.3.172_1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.wisdom-framework</groupId>
-            <artifactId>wisdom-jdbc-datasources</artifactId>
-            <version>0.5-SNAPSHOT</version>
         </dependency>
 ````
 
@@ -145,7 +132,7 @@ classes:
 <plugin>
     <groupId>org.wisdom-framework</groupId>
     <artifactId>wisdom-openjpa-enhancer-plugin</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.10.0-SNAPSHOT</version>
     <configuration>
         <includes>**/models/*.class</includes>
         <addDefaultConstructor>true</addDefaultConstructor>
@@ -160,13 +147,6 @@ classes:
             </goals>
         </execution>
     </executions>
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.openjpa</groupId>
-            <artifactId>openjpa</artifactId>
-            <version>2.3.0</version>
-        </dependency>
-    </dependencies>
 </plugin>
 ````
 
@@ -179,7 +159,7 @@ declare JTA as a library:
 <plugin>
     <groupId>org.wisdom-framework</groupId>
     <artifactId>wisdom-maven-plugin</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.10.0-SNAPSHOT</version>
     <extensions>true</extensions>
     <configuration>
         <skipGoogleClosure>true</skipGoogleClosure>

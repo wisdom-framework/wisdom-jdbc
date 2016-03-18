@@ -389,7 +389,9 @@ public class HikariCPDataSources implements DataSources {
             HikariDataSource ds = entry.getValue();
             if (ds != null && driverClassName.equals(getRequiredDriver(entry.getKey()))) {
                 // A used driver just left....
+                //TODO Unregister only the leaving Datasource service ?
                 unregister();
+                //TODO remove the entry completely ?
                 sources.put(entry.getKey(), null);
                 LOGGER.info("Driver {} left the DataSourceFactory", driverClassName);
             }
@@ -399,9 +401,10 @@ public class HikariCPDataSources implements DataSources {
     private void shutdownPool(HikariDataSource source) {
         LOGGER.info("Shutting down connection pool.");
         if (source != null) {
-            source.shutdown();
+            source.close();
         } else {
-            throw new IllegalArgumentException("Cannot close a data source not managed by the manager :" + source);
+            LOGGER.error("Cannot close a data source not managed by the manager (not anymore at least) : {}", source);
+            //throw new IllegalArgumentException("Cannot close a data source not managed by the manager :" + source);
         }
     }
 
