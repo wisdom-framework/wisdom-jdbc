@@ -148,6 +148,16 @@
                         <excludeFromApplication>true</excludeFromApplication>
                     </libraries>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>default-compile-coffeescript</id>
+                        <phase/>
+                    </execution>
+                    <execution>
+                        <id>default-optimize-images</id>
+                        <phase/>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
