@@ -200,6 +200,7 @@ public class JPAManager {
                     } else {
                         Persistence.PersistenceUnit previousPu = pus.get(jta);
                         previousPu.getClazz().addAll(pu.getClazz());
+                        set.add(previousPu);
                         LOGGER.info("Recycling persistence unit {}", previousPu);
                     }
                 }
