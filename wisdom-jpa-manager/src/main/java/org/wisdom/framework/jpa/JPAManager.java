@@ -30,12 +30,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wisdom.framework.jpa.model.Persistence;
 
+import javax.persistence.spi.PersistenceProvider;
 import javax.xml.bind.JAXB;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * The entry point of the JPA bridge.
@@ -55,8 +55,6 @@ public class JPAManager {
      * The logger.
      */
     private final static Logger LOGGER = LoggerFactory.getLogger(JPAManager.class);
-
-    private Map<String, Persistence.PersistenceUnit> pus = new HashMap<>();
 
     /**
      * The bundle context, used to register the tracker.
@@ -117,7 +115,6 @@ public class JPAManager {
              */
             @Override
             public void removedBundle(Bundle bundle, BundleEvent event, PersistentBundle pu) {
-
                 pu.destroy();
             }
         };
@@ -188,21 +185,12 @@ public class JPAManager {
                 Persistence persistence = JAXB.unmarshal(url, Persistence.class);
                 LOGGER.info("Parsed persistence: {}, unit {}", persistence, persistence.getPersistenceUnit());
                 for (Persistence.PersistenceUnit pu : persistence.getPersistenceUnit()) {
-                    final String jta = pu.getJtaDataSource();
-                    if(!pus.containsKey(jta)) {
-                        if (pu.getProperties() == null) {
-                            pu.setProperties(new Persistence.PersistenceUnit.Properties());
-                        }
-                        pu.getProperties().getProperty().add(p);
-                        set.add(pu);
-                        pus.put(jta, pu);
-                        LOGGER.info("Adding persistence unit {}", pu);
-                    } else {
-                        Persistence.PersistenceUnit previousPu = pus.get(jta);
-                        previousPu.getClazz().addAll(pu.getClazz());
-                        set.add(previousPu);
-                        LOGGER.info("Recycling persistence unit {}", previousPu);
+                    if (pu.getProperties() == null) {
+                        pu.setProperties(new Persistence.PersistenceUnit.Properties());
                     }
+                    pu.getProperties().getProperty().add(p);
+                    set.add(pu);
+                    LOGGER.info("Adding persistence unit {}", pu);
                 }
             }
         }
