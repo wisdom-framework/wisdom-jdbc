@@ -35,48 +35,48 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>2.4.4</version>
+            <version>${hikaricp.version}</version>
         </dependency>
 
         <!-- The JDBC drivers used for IT -->
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.191_1-SNAPSHOT</version>
+            <version>${wisdom.h2.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>derby</artifactId>
-            <version>10.12.1.1_1-SNAPSHOT</version>
+            <version>${wisdom.derby.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>2.3.3_1-SNAPSHOT</version>
+            <version>${wisdom.hsql.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.8.11.2_1-SNAPSHOT</version>
+            <version>${wisdom.sqlite.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.38_1-SNAPSHOT</version>
+            <version>${wisdom.mysql.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.4.1208_1-SNAPSHOT</version>
+            <version>${wisdom.postgresql.version}</version>
             <scope>test</scope>
         </dependency>
 

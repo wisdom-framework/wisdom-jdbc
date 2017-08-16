@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>mysql-connector-java</artifactId>
-    <version>5.1.38_1-SNAPSHOT</version>
+    <version>${wisdom.mysql.version}</version>
 
     <packaging>bundle</packaging>
     <properties>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>abstract-jdbc-driver</artifactId>
-            <version>0.10.0-SNAPSHOT</version>
+            <version>${wisdom.abstractjdbcdriver.version}</version>
         </dependency>
 
         <dependency>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.38</version>
+            <version>${mysql.version}</version>
             <scope>provided</scope>
         </dependency>
 

@@ -30,7 +30,6 @@
 
     <groupId>org.wisdom-framework.jdbc</groupId>
     <artifactId>openjpa-sample</artifactId>
-    <version>0.10.0-SNAPSHOT</version>
 
     <packaging>wisdom</packaging>
 
@@ -94,7 +93,7 @@
         <dependency>
             <groupId>org.wisdom-framework</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.191_1-SNAPSHOT</version>
+            <version>${wisdom.h2.version}</version>
         </dependency>
 
         <!-- Other applications -->

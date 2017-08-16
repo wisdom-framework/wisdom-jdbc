@@ -15,7 +15,25 @@
   <properties>
     <!-- should match Wisdom parent -->
     <wisdom.version>0.10.0-SNAPSHOT</wisdom.version>
-    <openjpa.version>2.4.1</openjpa.version>
+    <wisdom.abstractjdbcdriver.version>${wisdom.version}</wisdom.abstractjdbcdriver.version>
+    <!-- components -->
+    <openjpa.version>2.4.2</openjpa.version>
+    <hikaricp.version>2.6.3</hikaricp.version>
+    <!-- drivers -->
+    <derby.version>10.13.1.1</derby.version>
+    <h2.version>1.4.196</h2.version>
+    <hsql.version>2.4.0</hsql.version>
+    <mysql.version>5.1.43</mysql.version>
+    <postgresql.version>42.1.4</postgresql.version>
+    <sqlite.version>3.20.0</sqlite.version>
+    <!-- wisdom drivers modules -->
+    <wisdom.abstractjdbcdriver.version>0.10.0-SNAPSHOT</wisdom.abstractjdbcdriver.version>
+    <wisdom.derby.version>${derby.version}_1-SNAPSHOT</wisdom.derby.version>
+    <wisdom.h2.version>${h2.version}_1-SNAPSHOT</wisdom.h2.version>
+    <wisdom.hsql.version>${hsql.version}_1-SNAPSHOT</wisdom.hsql.version>
+    <wisdom.mysql.version>${mysql.version}_1-SNAPSHOT</wisdom.mysql.version>
+    <wisdom.postgresql.version>${postgresql.version}_1-SNAPSHOT</wisdom.postgresql.version>
+    <wisdom.sqlite.version>${sqlite.version}_1-SNAPSHOT</wisdom.sqlite.version>
   </properties>
 
   <packaging>pom</packaging>
