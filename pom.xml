@@ -18,14 +18,14 @@
     <wisdom.abstractjdbcdriver.version>${wisdom.version}</wisdom.abstractjdbcdriver.version>
     <!-- components -->
     <openjpa.version>2.4.2</openjpa.version>
-    <hikaricp.version>2.6.0</hikaricp.version>
+    <hikaricp.version>2.6.3</hikaricp.version>
     <!-- drivers -->
     <derby.version>10.13.1.1</derby.version>
-    <h2.version>1.4.193</h2.version>
-    <hsql.version>2.3.4</hsql.version>
-    <mysql.version>5.1.40</mysql.version>
-    <postgresql.version>9.4.1212</postgresql.version>
-    <sqlite.version>3.16.1</sqlite.version>
+    <h2.version>1.4.196</h2.version>
+    <hsql.version>2.4.0</hsql.version>
+    <mysql.version>5.1.43</mysql.version>
+    <postgresql.version>42.1.4</postgresql.version>
+    <sqlite.version>3.20.0</sqlite.version>
     <!-- wisdom drivers modules -->
     <wisdom.abstractjdbcdriver.version>0.10.0-SNAPSHOT</wisdom.abstractjdbcdriver.version>
     <wisdom.derby.version>${derby.version}_1-SNAPSHOT</wisdom.derby.version>
