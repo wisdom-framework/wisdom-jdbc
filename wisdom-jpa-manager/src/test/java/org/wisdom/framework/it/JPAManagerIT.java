@@ -25,7 +25,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.chameleon.testing.helpers.OSGiHelper;
-import org.wisdom.api.annotations.Interception;
 import org.wisdom.api.model.Crud;
 import org.wisdom.api.model.EntityFilter;
 import org.wisdom.api.model.HasBeenRollBackException;
@@ -45,7 +44,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.transaction.*;
-import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -257,7 +255,7 @@ public class JPAManagerIT extends WisdomTest {
     }
 
     @Test
-    public void testStudentCrudService() {
+    public void testStudentCrudService() throws HasBeenRollBackException {
         Student student1 = new Student();
         student1.setName("A");
         students.save(student1);
@@ -364,19 +362,26 @@ public class JPAManagerIT extends WisdomTest {
         assertThat(cars.getRepository().get()).isEqualTo(jtaEm);
 
         cars.delete(car2.id);
-        cars.executeTransactionalBlock(new Runnable() {
-            @Override
-            public void run() {
-                Iterable<Car> list = cars.findAll();
-                assertThat(Iterables.size(list)).isEqualTo(2);
 
-                for (Car c : list) {
-                    cars.delete(c);
+            cars.executeTransactionalBlock(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Iterable<Car> list = cars.findAll();
+                        assertThat(Iterables.size(list)).isEqualTo(2);
+
+                        for (Car c : list) {
+                            cars.delete(c);
+                        }
+
+                        assertThat(cars.count()).isEqualTo(0);
+
+                    } catch (HasBeenRollBackException e) {
+                        System.out.println("HasBeenRollBackException");
+                    }
                 }
+            });
 
-                assertThat(cars.count()).isEqualTo(0);
-            }
-        });
 
         assertThat(cars.count()).isEqualTo(0);
 

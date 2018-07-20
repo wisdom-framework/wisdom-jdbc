@@ -197,7 +197,7 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * @return the entity instance, {@literal null} if there are no entities matching the given id.
      */
     @Override
-    public T findOne(final I id) {
+    public T findOne(final I id) throws HasBeenRollBackException {
         return inTransaction(new Callable<T>() {
             @Override
             public T call() throws Exception {
@@ -213,7 +213,7 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * @return the instances, empty if none.
      */
     @Override
-    public Iterable<T> findAll() {
+    public Iterable<T> findAll() throws HasBeenRollBackException {
         return inTransaction(new Callable<Iterable<T>>() {
             @Override
             public Iterable<T> call() throws Exception {
@@ -232,7 +232,7 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * @return the first matching instance, {@literal null} if none
      */
     @Override
-    public T findOne(EntityFilter<T> filter) {
+    public T findOne(EntityFilter<T> filter) throws HasBeenRollBackException {
         for (T object : findAll()) {
             if (filter.accept(object)) {
                 return object;
@@ -248,7 +248,7 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * @return the instances, empty if none.
      */
     @Override
-    public Iterable<T> findAll(Iterable<I> ids) {
+    public Iterable<T> findAll(Iterable<I> ids) throws HasBeenRollBackException {
         List<T> results = new ArrayList<>();
         for (I id : ids) {
             T t = findOne(id);
@@ -267,7 +267,7 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * @return the matching instances, empty if none.
      */
     @Override
-    public Iterable<T> findAll(EntityFilter<T> filter) {
+    public Iterable<T> findAll(EntityFilter<T> filter) throws HasBeenRollBackException {
         List<T> results = new ArrayList<>();
         for (T object : findAll()) {
             if (filter.accept(object)) {
@@ -284,7 +284,7 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * @return the entity instance, may be the same as the parameter t but can also be different
      */
     @Override
-    public T delete(final T t) {
+    public T delete(final T t) throws HasBeenRollBackException {
         return inTransaction(
                 new Callable<T>() {
                     @Override
@@ -305,7 +305,7 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * @param id the id
      */
     @Override
-    public void delete(final I id) {
+    public void delete(final I id) throws HasBeenRollBackException {
         if (entity != null) {
             inTransaction(
                     new Callable<Void>() {
@@ -331,7 +331,7 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * 'managed' version of the object, return {@code null}.
      */
     @SuppressWarnings("unchecked")
-    private T getAttached(T object) {
+    private T getAttached(T object) throws HasBeenRollBackException {
         if (entityManager.contains(object)) {
             return object;
         } else {
@@ -347,7 +347,7 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * @return the set of entity instances
      */
     @Override
-    public Iterable<T> delete(final Iterable<T> entities) {
+    public Iterable<T> delete(final Iterable<T> entities) throws HasBeenRollBackException {
         return inTransaction(new Callable<Iterable<T>>() {
             @Override
             public Iterable<T> call() throws Exception {
@@ -372,7 +372,7 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * @return the saved entity
      */
     @Override
-    public T save(final T t) {
+    public T save(final T t) throws HasBeenRollBackException {
         return inTransaction(new Callable<T>() {
             @Override
             public T call() throws Exception {
@@ -396,7 +396,7 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * @return {@literal true} if an entity with the given id exists, {@literal false} otherwise.
      */
     @Override
-    public boolean exists(I id) {
+    public boolean exists(I id) throws HasBeenRollBackException {
         return findOne(id) != null;
     }
 
@@ -406,7 +406,7 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * @return the number of stored instances, 0 if none.
      */
     @Override
-    public long count() {
+    public long count() throws HasBeenRollBackException {
         return Iterables.size(findAll());
     }
 
@@ -418,7 +418,7 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * @return the saved entities
      */
     @Override
-    public Iterable<T> save(final Iterable<T> entities) {
+    public Iterable<T> save(final Iterable<T> entities) throws HasBeenRollBackException {
         return inTransaction(new Callable<Iterable<T>>() {
             @Override
             public Iterable<T> call() throws Exception {
@@ -437,6 +437,6 @@ public abstract class AbstractJTACrud<T, I extends Serializable> implements Crud
      * @param <X>  the return type, can be {@code Void}
      * @return the result of the operation.
      */
-    protected abstract <X> X inTransaction(Callable<X> task);
+    protected abstract <X> X inTransaction(Callable<X> task) throws HasBeenRollBackException;
 
 }
