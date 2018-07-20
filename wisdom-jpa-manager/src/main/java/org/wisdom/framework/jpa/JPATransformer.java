@@ -97,7 +97,7 @@ public class JPATransformer implements WeavingHook {
                 }
                 trfs = list.toArray(new ClassTransformer[list.size()]);
             }
-            LOGGER.info("Transforming {} with {}", clazz.getClassName(), Arrays.toString(trfs));
+            LOGGER.debug("Transforming {} with {}", clazz.getClassName(), Arrays.toString(trfs));
             for (ClassTransformer ctf : trfs) {
                 if (ctf != null) {
                     ctf.transform(wiring.getClassLoader(), clazz.getClassName(), clazz.getDefinedClass(),

@@ -116,11 +116,11 @@ public class JTAEntityCrud<T, I extends Serializable> extends AbstractJTACrud<T,
         try {
             Transaction tx = getActiveTransaction();
             if (tx == null) {
-                LOGGER.info("Starting JTA transaction locally");
+                LOGGER.debug("Starting JTA transaction locally");
                 transaction.begin();
                 transactionBegunLocally = true;
             } else {
-                LOGGER.info("Reusing JTA transaction {}", transaction.getTransaction());
+                LOGGER.debug("Reusing JTA transaction {}", transaction.getTransaction());
             }
             X result;
             try {
@@ -140,7 +140,7 @@ public class JTAEntityCrud<T, I extends Serializable> extends AbstractJTACrud<T,
                 return null;
             }
             if (transactionBegunLocally) {
-                LOGGER.info("Committing locally started transaction");
+                LOGGER.debug("Committing locally started transaction");
                 transaction.commit();
             }
             return result;
